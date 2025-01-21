@@ -51,7 +51,7 @@ target_include_directories(exetest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 find_package(dlltest REQUIRED PATHS C:/work/vscoderope/HandwrittenCNNwithGUI/build/dlltest NO_DEFAULT_PATH)
 
 # 链接库
-target_link_libraries(exetest PRIVATE dlltest::dlltest Qt6::Widgets)
+target_link_libraries(exetest PRIVATE dlltest::dlltest Qt6::Widgets) 
 # Add the target includes for MY_PROJECT 
 target_include_directories(exetest PRIVATE ${FORMS_DIR})
 target_include_directories(exetest PRIVATE ${INCLUDE_DIR})

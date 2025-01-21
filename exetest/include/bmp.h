@@ -37,3 +37,4 @@ struct RGBQUAD
     uint8_t rgbReserved;
 };
 #pragma pack(pop)
+void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path);

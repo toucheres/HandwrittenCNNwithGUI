@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <Point.h>
 #include "ui_mainWindow.h"
 
 class mainWindow : public QMainWindow
