@@ -1,6 +1,6 @@
 ﻿# exetest/CMakeLists.txt
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(exetest LANGUAGES CXX)
 
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
