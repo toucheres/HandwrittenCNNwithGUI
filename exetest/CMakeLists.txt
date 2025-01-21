@@ -3,6 +3,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(exetest LANGUAGES CXX)
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)

@@ -1,4 +1,4 @@
-#include <bmp.h>
+﻿#include <bmp.h>
 void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
 {
     const int width = 30, height = 30;

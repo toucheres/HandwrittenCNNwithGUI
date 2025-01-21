@@ -8,8 +8,10 @@ if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
-
-project ("MyProject")
+# ...existing code...
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+# ...existing code...
+project ("HandwrittenCNNwithGUI")
 
 # 包含子项目。
 add_subdirectory ("dlltest")

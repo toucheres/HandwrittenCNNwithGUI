@@ -1,223 +1,223 @@
-ï»¿#include "dynamic_lib.h"
+#include "dynamic_lib.h"
 #define DLL_API _declspec(dllexport)
-DLL_API int add_dll(int a, int b)   //å®ç°ä¸¤ä¸ªæ•´æ•°ç›¸åŠ 
+DLL_API int add_dll(int a, int b)   //ÊµÏÖÁ½¸öÕûÊıÏà¼Ó
 {
 	return a + b;
 }
 
-// å·ç§¯æ“ä½œå‡½æ•°
+// ¾í»ı²Ù×÷º¯Êı
 void Conv2d(int w, int h, int k, double *input_matrix, double *kernel, double *out_matrix)
 {
-	for (int i = 0; i < w - k + 1; i++) // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
+	for (int i = 0; i < w - k + 1; i++) // ±éÀúÊäÈë¾ØÕóµÄĞĞ
 		for (int j = 0; j < h - k + 1; j++)
-		{																												// éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			out_matrix[i * (w - k + 1) + j] = 0;																		// åˆå§‹åŒ–è¾“å‡ºçŸ©é˜µ
-			for (int row = i; row < i + 3; row++)																		// éå†å·ç§¯æ ¸çš„è¡Œ
-				for (int col = j; col < j + 3; col++)																	// éå†å·ç§¯æ ¸çš„åˆ—
-					out_matrix[i * (w - k + 1) + j] += input_matrix[row * w + col] * kernel[(row - i) * k + (col - j)]; // è®¡ç®—å·ç§¯ç»“æœ
+		{																												// ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			out_matrix[i * (w - k + 1) + j] = 0;																		// ³õÊ¼»¯Êä³ö¾ØÕó
+			for (int row = i; row < i + 3; row++)																		// ±éÀú¾í»ıºËµÄĞĞ
+				for (int col = j; col < j + 3; col++)																	// ±éÀú¾í»ıºËµÄÁĞ
+					out_matrix[i * (w - k + 1) + j] += input_matrix[row * w + col] * kernel[(row - i) * k + (col - j)]; // ¼ÆËã¾í»ı½á¹û
 		}
 }
 
-// æœ€å¤§æ± åŒ–æ“ä½œå‡½æ•°
+// ×î´ó³Ø»¯²Ù×÷º¯Êı
 void MaxPool2d(int w, int h, int k, double *input_matrix, double *output_matrix)
 {
-	for (int i = 0; i < w / k; i++) // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
+	for (int i = 0; i < w / k; i++) // ±éÀúÊäÈë¾ØÕóµÄĞĞ
 		for (int j = 0; j < h / k; j++)
-		{													   // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			int max_num = -999;								   // åˆå§‹åŒ–æœ€å¤§å€¼
-			for (int row = k * i; row < k * i + k; row++)	   // éå†æ± åŒ–çª—å£çš„è¡Œ
-				for (int col = k * j; col < k * j + k; col++)  // éå†æ± åŒ–çª—å£çš„åˆ—
-					if (input_matrix[row * w + col] > max_num) // æ›´æ–°æœ€å¤§å€¼
+		{													   // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			int max_num = -999;								   // ³õÊ¼»¯×î´óÖµ
+			for (int row = k * i; row < k * i + k; row++)	   // ±éÀú³Ø»¯´°¿ÚµÄĞĞ
+				for (int col = k * j; col < k * j + k; col++)  // ±éÀú³Ø»¯´°¿ÚµÄÁĞ
+					if (input_matrix[row * w + col] > max_num) // ¸üĞÂ×î´óÖµ
 						max_num = input_matrix[row * w + col];
-			output_matrix[i * (w / 2) + j] = max_num; // å°†æœ€å¤§å€¼èµ‹ç»™è¾“å‡ºçŸ©é˜µ
+			output_matrix[i * (w / 2) + j] = max_num; // ½«×î´óÖµ¸³¸øÊä³ö¾ØÕó
 		}
 }
 
-// important ReLU æ¿€æ´»å‡½æ•°
+// important ReLU ¼¤»îº¯Êı
 void Relu(int w, int h, double *input_matrix, double *output_matrix)
 {
-	for (int i = 0; i < w; i++)																		 // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
-		for (int j = 0; j < h; j++)																	 // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			output_matrix[i * w + j] = max(input_matrix[i * w + j], input_matrix[i * w + j] * 0.05); // è®¡ç®— ReLU æ¿€æ´»ç»“æœ
+	for (int i = 0; i < w; i++)																		 // ±éÀúÊäÈë¾ØÕóµÄĞĞ
+		for (int j = 0; j < h; j++)																	 // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			output_matrix[i * w + j] = max(input_matrix[i * w + j], input_matrix[i * w + j] * 0.05); // ¼ÆËã ReLU ¼¤»î½á¹û
 }
 
-// çŸ©é˜µæ‰©å±•å‡½æ•°
+// ¾ØÕóÀ©Õ¹º¯Êı
 void MatrixExtensionImproved(int w, int h, double *input_matrix1, double *input_matrix2, double *output_matrix)
 {
-	for (int i = 0; i < w; i++)									 // éå†è¾“å…¥çŸ©é˜µ1çš„è¡Œ
-		for (int j = 0; j < h; j++)								 // éå†è¾“å…¥çŸ©é˜µ1çš„åˆ—
-			output_matrix[i * w + j] = input_matrix1[i * w + j]; // å°†è¾“å…¥çŸ©é˜µ1çš„å€¼èµ‹ç»™è¾“å‡ºçŸ©é˜µ
+	for (int i = 0; i < w; i++)									 // ±éÀúÊäÈë¾ØÕó1µÄĞĞ
+		for (int j = 0; j < h; j++)								 // ±éÀúÊäÈë¾ØÕó1µÄÁĞ
+			output_matrix[i * w + j] = input_matrix1[i * w + j]; // ½«ÊäÈë¾ØÕó1µÄÖµ¸³¸øÊä³ö¾ØÕó
 
-	for (int i = 0; i < w; i++)											 // éå†è¾“å…¥çŸ©é˜µ2çš„è¡Œ
-		for (int j = 0; j < h; j++)										 // éå†è¾“å…¥çŸ©é˜µ2çš„åˆ—
-			output_matrix[w * h + i * w + j] = input_matrix2[i * w + j]; // å°†è¾“å…¥çŸ©é˜µ2çš„å€¼èµ‹ç»™è¾“å‡ºçŸ©é˜µ
+	for (int i = 0; i < w; i++)											 // ±éÀúÊäÈë¾ØÕó2µÄĞĞ
+		for (int j = 0; j < h; j++)										 // ±éÀúÊäÈë¾ØÕó2µÄÁĞ
+			output_matrix[w * h + i * w + j] = input_matrix2[i * w + j]; // ½«ÊäÈë¾ØÕó2µÄÖµ¸³¸øÊä³ö¾ØÕó
 }
 
-// important çŸ©é˜µä¹˜æ³•å‡½æ•°
+// important ¾ØÕó³Ë·¨º¯Êı
 void MatrixMultiply(int w, int h, int out_deminsion, double *input_matrix, double *para_layer, double *output_matrix)
 {
-	for (int i = 0; i < w; i++) // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
+	for (int i = 0; i < w; i++) // ±éÀúÊäÈë¾ØÕóµÄĞĞ
 		for (int j = 0; j < out_deminsion; j++)
-		{																								 // éå†è¾“å‡ºçŸ©é˜µçš„åˆ—
-			output_matrix[i * w + j] = 0;																 // åˆå§‹åŒ–è¾“å‡ºçŸ©é˜µ
-			for (int k = 0; k < h; k++)																	 // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-				output_matrix[i * w + j] += input_matrix[i * w + k] * para_layer[k * out_deminsion + j]; // è®¡ç®—çŸ©é˜µä¹˜æ³•ç»“æœ
+		{																								 // ±éÀúÊä³ö¾ØÕóµÄÁĞ
+			output_matrix[i * w + j] = 0;																 // ³õÊ¼»¯Êä³ö¾ØÕó
+			for (int k = 0; k < h; k++)																	 // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+				output_matrix[i * w + j] += input_matrix[i * w + k] * para_layer[k * out_deminsion + j]; // ¼ÆËã¾ØÕó³Ë·¨½á¹û
 		}
 }
 
-// çŸ©é˜µåˆ†å‰²å‡½æ•°
+// ¾ØÕó·Ö¸îº¯Êı
 void MatrixSplit(double *input_matrix, double *splited_matrix1, double *splited_matrix2)
 {
-	for (int idx = 0; idx < 1152; idx++) // éå†è¾“å…¥çŸ©é˜µ
-		if (idx < 576)					 // å‰ä¸€åŠèµ‹ç»™åˆ†å‰²çŸ©é˜µ1
+	for (int idx = 0; idx < 1152; idx++) // ±éÀúÊäÈë¾ØÕó
+		if (idx < 576)					 // Ç°Ò»°ë¸³¸ø·Ö¸î¾ØÕó1
 			splited_matrix1[idx] = input_matrix[idx];
-		else // åä¸€åŠèµ‹ç»™åˆ†å‰²çŸ©é˜µ2
+		else // ºóÒ»°ë¸³¸ø·Ö¸î¾ØÕó2
 			splited_matrix2[idx - 576] = input_matrix[idx];
 }
 
-// çŸ©é˜µåå‘ä¼ æ’­å‡½æ•°
+// ¾ØÕó·´Ïò´«²¥º¯Êı
 void MatrixBackPropagation(int w, int h, double *input_matrix, double *output_matrix)
 {
-	for (int i = 0; i < w; i++)										  // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
-		for (int j = 0; j < h; j++)									  // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			output_matrix[i * h + j] -= lr * input_matrix[i * h + j]; // è®¡ç®—åå‘ä¼ æ’­ç»“æœ
+	for (int i = 0; i < w; i++)										  // ±éÀúÊäÈë¾ØÕóµÄĞĞ
+		for (int j = 0; j < h; j++)									  // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			output_matrix[i * h + j] -= lr * input_matrix[i * h + j]; // ¼ÆËã·´Ïò´«²¥½á¹û
 }
 
-// çŸ©é˜µåå‘ä¼ æ’­ä¹˜æ³•å‡½æ•°
+// ¾ØÕó·´Ïò´«²¥³Ë·¨º¯Êı
 void MatrixBackPropagationMultiply(int w, int h, double *para, double *grad, double *rgrad)
 {
-	for (int i = 0; i < w; i++)					  // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
-		for (int j = 0; j < h; j++)				  // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			rgrad[i * h + j] = para[i] * grad[j]; // è®¡ç®—åå‘ä¼ æ’­ä¹˜æ³•ç»“æœ
+	for (int i = 0; i < w; i++)					  // ±éÀúÊäÈë¾ØÕóµÄĞĞ
+		for (int j = 0; j < h; j++)				  // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			rgrad[i * h + j] = para[i] * grad[j]; // ¼ÆËã·´Ïò´«²¥³Ë·¨½á¹û
 }
 
-// è®¡ç®—çŸ©é˜µæ¢¯åº¦å‡½æ•°
+// ¼ÆËã¾ØÕóÌİ¶Èº¯Êı
 void CalculateMatrixGrad(int w, int h, double *input_matrix, double *grad, double *output_matrix)
 {
 	for (int i = 0; i < w; i++)
-	{						  // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
-		output_matrix[i] = 0; // åˆå§‹åŒ–è¾“å‡ºçŸ©é˜µ
+	{						  // ±éÀúÊäÈë¾ØÕóµÄĞĞ
+		output_matrix[i] = 0; // ³õÊ¼»¯Êä³ö¾ØÕó
 		for (int j = 0; j < h; j++)
-		{														   // éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			output_matrix[i] += input_matrix[i * h + j] * grad[j]; // è®¡ç®—çŸ©é˜µæ¢¯åº¦
+		{														   // ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			output_matrix[i] += input_matrix[i * h + j] * grad[j]; // ¼ÆËã¾ØÕóÌİ¶È
 		}
 	}
 }
 
-// ReLU åå‘ä¼ æ’­å‡½æ•°
+// ReLU ·´Ïò´«²¥º¯Êı
 void ReluBackPropagation(int w, double *input_matrix, double *grad, double *output_matrix)
 {
-	for (int i = 0; i < w; i++) // éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
+	for (int i = 0; i < w; i++) // ±éÀúÊäÈë¾ØÕóµÄĞĞ
 		if (input_matrix[i] > 0)
-			output_matrix[i] = 1 * grad[i]; // æ­£å€¼éƒ¨åˆ†æ¢¯åº¦ä¸º1
+			output_matrix[i] = 1 * grad[i]; // ÕıÖµ²¿·ÖÌİ¶ÈÎª1
 		else
-			output_matrix[i] = 0.05 * grad[i]; // è´Ÿå€¼éƒ¨åˆ†æ¢¯åº¦ä¸º0.05
+			output_matrix[i] = 0.05 * grad[i]; // ¸ºÖµ²¿·ÖÌİ¶ÈÎª0.05
 }
 
-// å¡«å……æ“ä½œå‡½æ•°
+// Ìî³ä²Ù×÷º¯Êı
 void Padding(int w, int stride, double *input_matrix, double *output_matrix)
 {
-	for (int i = 0; i < w + 2 * stride; i++)			 // éå†è¾“å‡ºçŸ©é˜µçš„è¡Œ
-		for (int j = 0; j < w + 2 * stride; j++)		 // éå†è¾“å‡ºçŸ©é˜µçš„åˆ—
-			output_matrix[i * (w + 2 * stride) + j] = 0; // åˆå§‹åŒ–è¾“å‡ºçŸ©é˜µ
+	for (int i = 0; i < w + 2 * stride; i++)			 // ±éÀúÊä³ö¾ØÕóµÄĞĞ
+		for (int j = 0; j < w + 2 * stride; j++)		 // ±éÀúÊä³ö¾ØÕóµÄÁĞ
+			output_matrix[i * (w + 2 * stride) + j] = 0; // ³õÊ¼»¯Êä³ö¾ØÕó
 }
 
-// ç¿»è½¬å·ç§¯æ ¸å‡½æ•°
+// ·­×ª¾í»ıºËº¯Êı
 void OverturnKernel(int k, double *input_matrix, double *output_matrix)
 {
-	for (int i = 0; i < k; i++)														// éå†è¾“å…¥çŸ©é˜µçš„è¡Œ
-		for (int j = 0; j < k; j++)													// éå†è¾“å…¥çŸ©é˜µçš„åˆ—
-			output_matrix[(k - 1 - i) * k + (k - 1 - j)] = input_matrix[i * k + j]; // ç¿»è½¬å·ç§¯æ ¸
+	for (int i = 0; i < k; i++)														// ±éÀúÊäÈë¾ØÕóµÄĞĞ
+		for (int j = 0; j < k; j++)													// ±éÀúÊäÈë¾ØÕóµÄÁĞ
+			output_matrix[(k - 1 - i) * k + (k - 1 - j)] = input_matrix[i * k + j]; // ·­×ª¾í»ıºË
 }
 
-// é‡Šæ”¾å†…å­˜å‡½æ•°
+// ÊÍ·ÅÄÚ´æº¯Êı
 void MemoryFree(double *x)
 {
-	free(x);  // é‡Šæ”¾å†…å­˜
-	x = NULL; // å°†æŒ‡é’ˆç½®ä¸ºç©º
+	free(x);  // ÊÍ·ÅÄÚ´æ
+	x = NULL; // ½«Ö¸ÕëÖÃÎª¿Õ
 }
 
-// åˆå§‹åŒ–ç½‘ç»œå‚æ•°å‡½æ•°
+// ³õÊ¼»¯ÍøÂç²ÎÊıº¯Êı
 DLL_API void init(struct parameter *para)
 {
 	srand(time(NULL));
-	// åˆå§‹åŒ–éšæœºæ•°ç§å­
-	for (int i = 0; i < 3; i++)										 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)									 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel11[i][j] = (rand() / (RAND_MAX + 1.0)); // åˆå§‹åŒ–å·ç§¯æ ¸1ç¬¬1å±‚
-																	 // 0-1çš„éšæœºæ•°
-	for (int i = 0; i < 3; i++)										 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)									 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel12[i][j] = (rand() / (RAND_MAX + 1.0)); // åˆå§‹åŒ–å·ç§¯æ ¸1ç¬¬2å±‚
+	// ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó
+	for (int i = 0; i < 3; i++)										 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)									 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel11[i][j] = (rand() / (RAND_MAX + 1.0)); // ³õÊ¼»¯¾í»ıºË1µÚ1²ã
+																	 // 0-1µÄËæ»úÊı
+	for (int i = 0; i < 3; i++)										 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)									 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel12[i][j] = (rand() / (RAND_MAX + 1.0)); // ³õÊ¼»¯¾í»ıºË1µÚ2²ã
 
-	for (int i = 0; i < 3; i++)											 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)										 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel21[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // åˆå§‹åŒ–å·ç§¯æ ¸1ç¬¬3å±‚
-																		 // 0-0.2éšæœºæ•°
-	for (int i = 0; i < 3; i++)											 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)										 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel22[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // åˆå§‹åŒ–å·ç§¯æ ¸2ç¬¬1å±‚
+	for (int i = 0; i < 3; i++)											 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)										 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel21[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // ³õÊ¼»¯¾í»ıºË1µÚ3²ã
+																		 // 0-0.2Ëæ»úÊı
+	for (int i = 0; i < 3; i++)											 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)										 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel22[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // ³õÊ¼»¯¾í»ıºË2µÚ1²ã
 
-	for (int i = 0; i < 3; i++)											 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)										 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel31[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // åˆå§‹åŒ–å·ç§¯æ ¸2ç¬¬2å±‚
+	for (int i = 0; i < 3; i++)											 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)										 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel31[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // ³õÊ¼»¯¾í»ıºË2µÚ2²ã
 
-	for (int i = 0; i < 3; i++)											 // éå†å·ç§¯æ ¸çš„è¡Œ
-		for (int j = 0; j < 3; j++)										 // éå†å·ç§¯æ ¸çš„åˆ—
-			para->conv_kernel32[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // åˆå§‹åŒ–å·ç§¯æ ¸2ç¬¬3å±‚
+	for (int i = 0; i < 3; i++)											 // ±éÀú¾í»ıºËµÄĞĞ
+		for (int j = 0; j < 3; j++)										 // ±éÀú¾í»ıºËµÄÁĞ
+			para->conv_kernel32[i][j] = (rand() / (RAND_MAX + 1.0)) / 5; // ³õÊ¼»¯¾í»ıºË2µÚ3²ã
 
-	for (int i = 0; i < 1152; i++)											   // éå†å…¨è¿æ¥å±‚1çš„è¡Œ
-		for (int j = 0; j < 180; j++)										   // éå†å…¨è¿æ¥å±‚1çš„åˆ—
-			para->fc_hidden_layer1[i][j] = (rand() / (RAND_MAX + 1.0)) / 1000; // åˆå§‹åŒ–å…¨è¿æ¥å±‚1
-																			   // éšæœºæ•°0-0.001
-	for (int i = 0; i < 180; i++)											   // éå†å…¨è¿æ¥å±‚2çš„è¡Œ
-		for (int j = 0; j < 45; j++)										   // éå†å…¨è¿æ¥å±‚2çš„åˆ—
-			para->fc_hidden_layer2[i][j] = (rand() / (RAND_MAX + 1.0)) / 100;  // åˆå§‹åŒ–å…¨è¿æ¥å±‚2
-																			   // éšæœºæ•°0-0.01
-	for (int i = 0; i < 45; i++)											   // éå†å…¨è¿æ¥å±‚3çš„è¡Œ
-		for (int j = 0; j < 10; j++)										   // éå†å…¨è¿æ¥å±‚3çš„åˆ—
-			para->fc_hidden_layer3[i][j] = (rand() / (RAND_MAX + 1.0)) / 10;   // åˆå§‹åŒ–å…¨è¿æ¥å±‚3
-																			   // éšæœºæ•°0-0.1
+	for (int i = 0; i < 1152; i++)											   // ±éÀúÈ«Á¬½Ó²ã1µÄĞĞ
+		for (int j = 0; j < 180; j++)										   // ±éÀúÈ«Á¬½Ó²ã1µÄÁĞ
+			para->fc_hidden_layer1[i][j] = (rand() / (RAND_MAX + 1.0)) / 1000; // ³õÊ¼»¯È«Á¬½Ó²ã1
+																			   // Ëæ»úÊı0-0.001
+	for (int i = 0; i < 180; i++)											   // ±éÀúÈ«Á¬½Ó²ã2µÄĞĞ
+		for (int j = 0; j < 45; j++)										   // ±éÀúÈ«Á¬½Ó²ã2µÄÁĞ
+			para->fc_hidden_layer2[i][j] = (rand() / (RAND_MAX + 1.0)) / 100;  // ³õÊ¼»¯È«Á¬½Ó²ã2
+																			   // Ëæ»úÊı0-0.01
+	for (int i = 0; i < 45; i++)											   // ±éÀúÈ«Á¬½Ó²ã3µÄĞĞ
+		for (int j = 0; j < 10; j++)										   // ±éÀúÈ«Á¬½Ó²ã3µÄÁĞ
+			para->fc_hidden_layer3[i][j] = (rand() / (RAND_MAX + 1.0)) / 10;   // ³õÊ¼»¯È«Á¬½Ó²ã3
+																			   // Ëæ»úÊı0-0.1
 }
 // readed
-// important å‰å‘ä¼ æ’­--å°†ä¸Šä¸€å±‚çš„è¾“å‡ºä½œä¸ºä¸‹ä¸€å±‚çš„è¾“å…¥--å›¾ç‰‡->æ¦‚ç‡å›¾->æ•°å­—
+// important Ç°Ïò´«²¥--½«ÉÏÒ»²ãµÄÊä³ö×÷ÎªÏÂÒ»²ãµÄÊäÈë--Í¼Æ¬->¸ÅÂÊÍ¼->Êı×Ö
 void forward(double *input_matrix, struct parameter *para, struct result *data)
 {
-	// å·ç§¯
-	// å·ç§¯æ ¸1:
-	// ç¬¬ä¸€å±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º30x30ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º28x28
+	// ¾í»ı
+	// ¾í»ıºË1:
+	// µÚÒ»²ã¾í»ı²Ù×÷£¬ÊäÈëÎª30x30£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª28x28
 	Conv2d(30, 30, 3, input_matrix, &para->conv_kernel11[0][0], &data->first_conv1[0][0]);
-	// ç¬¬äºŒå±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º28x28ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º26x26
+	// µÚ¶ş²ã¾í»ı²Ù×÷£¬ÊäÈëÎª28x28£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª26x26
 	Conv2d(28, 28, 3, &data->first_conv1[0][0], &para->conv_kernel21[0][0], &data->sencond_conv1[0][0]);
-	// ç¬¬ä¸‰å±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º26x26ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º24x24
+	// µÚÈı²ã¾í»ı²Ù×÷£¬ÊäÈëÎª26x26£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª24x24
 	Conv2d(26, 26, 3, &data->sencond_conv1[0][0], &para->conv_kernel31[0][0], &data->third_conv1[0][0]);
 
-	// å·ç§¯æ ¸2:
-	// ç¬¬ä¸€å±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º30x30ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º28x28
+	// ¾í»ıºË2:
+	// µÚÒ»²ã¾í»ı²Ù×÷£¬ÊäÈëÎª30x30£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª28x28
 	Conv2d(30, 30, 3, input_matrix, &para->conv_kernel12[0][0], &data->first_conv2[0][0]);
-	// ç¬¬äºŒå±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º28x28ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º26x26
+	// µÚ¶ş²ã¾í»ı²Ù×÷£¬ÊäÈëÎª28x28£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª26x26
 	Conv2d(28, 28, 3, &data->first_conv2[0][0], &para->conv_kernel22[0][0], &data->sencond_conv2[0][0]);
-	// ç¬¬ä¸‰å±‚å·ç§¯æ“ä½œï¼Œè¾“å…¥ä¸º26x26ï¼Œå·ç§¯æ ¸å¤§å°ä¸º3x3ï¼Œè¾“å‡ºä¸º24x24
+	// µÚÈı²ã¾í»ı²Ù×÷£¬ÊäÈëÎª26x26£¬¾í»ıºË´óĞ¡Îª3x3£¬Êä³öÎª24x24
 	Conv2d(26, 26, 3, &data->sencond_conv2[0][0], &para->conv_kernel32[0][0], &data->third_conv2[0][0]);
 
-	// å°†ä¸¤ä¸ªé€šé“çš„å·ç§¯ç»“æœè¿›è¡Œæ‹¼æ¥ï¼Œå¾—åˆ°1x1152çš„å‘é‡
+	// ½«Á½¸öÍ¨µÀµÄ¾í»ı½á¹û½øĞĞÆ´½Ó£¬µÃµ½1x1152µÄÏòÁ¿
 	MatrixExtensionImproved(24, 24, &data->third_conv1[0][0], &data->third_conv2[0][0], &data->flatten_conv[0][0]);
 
-	// å…¨è¿æ¥
-	// å…¨è¿æ¥å±‚1ï¼Œè¾“å…¥ä¸º1x1152ï¼Œè¾“å‡ºä¸º1x180
+	// È«Á¬½Ó
+	// È«Á¬½Ó²ã1£¬ÊäÈëÎª1x1152£¬Êä³öÎª1x180
 	MatrixMultiply(1, 1152, 180, &data->flatten_conv[0][0], &para->fc_hidden_layer1[0][0], &data->first_fc[0][0]);
-	// ReLUæ¿€æ´»å‡½æ•°ï¼Œè¾“å…¥ä¸º1x180ï¼Œè¾“å‡ºä¸º1x180
+	// ReLU¼¤»îº¯Êı£¬ÊäÈëÎª1x180£¬Êä³öÎª1x180
 	Relu(1, 180, &data->first_fc[0][0], &data->first_relu[0][0]);
-	// å…¨è¿æ¥å±‚2ï¼Œè¾“å…¥ä¸º1x180ï¼Œè¾“å‡ºä¸º1x45
+	// È«Á¬½Ó²ã2£¬ÊäÈëÎª1x180£¬Êä³öÎª1x45
 	MatrixMultiply(1, 180, 45, &data->first_relu[0][0], &para->fc_hidden_layer2[0][0], &data->second_fc[0][0]);
-	// ReLUæ¿€æ´»å‡½æ•°ï¼Œè¾“å…¥ä¸º1x45ï¼Œè¾“å‡ºä¸º1x45
+	// ReLU¼¤»îº¯Êı£¬ÊäÈëÎª1x45£¬Êä³öÎª1x45
 	Relu(1, 45, &data->second_fc[0][0], &data->second_relu[0][0]);
-	// å…¨è¿æ¥å±‚3ï¼Œè¾“å…¥ä¸º1x45ï¼Œè¾“å‡ºä¸º1x10
+	// È«Á¬½Ó²ã3£¬ÊäÈëÎª1x45£¬Êä³öÎª1x10
 	MatrixMultiply(1, 45, 10, &data->second_relu[0][0], &para->fc_hidden_layer3[0][0], &data->outmlp[0][0]);
 	double probability = 0;
 
-	// è®¡ç®—æ¦‚ç‡ï¼Œè¾“å‡ºç»“æœ
-	// è®¡ç®—softmaxæ¦‚ç‡
+	// ¼ÆËã¸ÅÂÊ£¬Êä³ö½á¹û
+	// ¼ÆËãsoftmax¸ÅÂÊ
 	for (int i = 0; i < 10; i++)
 		probability += exp(data->outmlp[0][i]);
 	for (int i = 0; i < 10; i++)
@@ -226,10 +226,10 @@ void forward(double *input_matrix, struct parameter *para, struct result *data)
 		result[i] = data->result[i];
 	}
 }
-// important å¯¹å‚æ•°æƒé‡å…³äºç»“æœè¿›è¡Œæ±‚å¯¼ï¼Œè¿­ä»£å‚æ•°æƒé‡
+// important ¶Ô²ÎÊıÈ¨ÖØ¹ØÓÚ½á¹û½øĞĞÇóµ¼£¬µü´ú²ÎÊıÈ¨ÖØ
 void backward(int label, struct parameter *para, struct result *data)
 {
-	// è®¡ç®—è¾“å‡ºå±‚çš„æ¢¯åº¦
+	// ¼ÆËãÊä³ö²ãµÄÌİ¶È
 	int double_len = sizeof(double);
 	double *out_grad;
 	out_grad = (double *)malloc(10 * double_len);
@@ -239,52 +239,52 @@ void backward(int label, struct parameter *para, struct result *data)
 		else
 			out_grad[i] = data->result[i] - 0;
 
-	// è®¡ç®—å…¨è¿æ¥å±‚3çš„æƒé‡æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã3µÄÈ¨ÖØÌİ¶È
 	double *out_wgrad;
 	out_wgrad = (double *)malloc(450 * double_len);
 	MatrixBackPropagationMultiply(45, 10, &data->second_relu[0][0], out_grad, out_wgrad);
 
-	// è®¡ç®—å…¨è¿æ¥å±‚3çš„è¾“å…¥æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã3µÄÊäÈëÌİ¶È
 	double *second_rgrad;
 	second_rgrad = (double *)malloc(45 * double_len);
 	CalculateMatrixGrad(45, 10, &para->fc_hidden_layer3[0][0], out_grad, second_rgrad);
 	MemoryFree(out_grad);
 
-	// è®¡ç®—ReLUæ¿€æ´»å‡½æ•°çš„æ¢¯åº¦
+	// ¼ÆËãReLU¼¤»îº¯ÊıµÄÌİ¶È
 	double *second_grad;
 	second_grad = (double *)malloc(180 * double_len);
 	ReluBackPropagation(45, &data->second_fc[0][0], second_rgrad, second_grad);
 	MemoryFree(second_rgrad);
 
-	// è®¡ç®—å…¨è¿æ¥å±‚2çš„æƒé‡æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã2µÄÈ¨ÖØÌİ¶È
 	double *second_wgrad;
 	second_wgrad = (double *)malloc(8100 * double_len);
 	MatrixBackPropagationMultiply(180, 45, &data->first_relu[0][0], second_grad, second_wgrad);
 
-	// è®¡ç®—å…¨è¿æ¥å±‚2çš„è¾“å…¥æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã2µÄÊäÈëÌİ¶È
 	double *first_rgrad;
 	first_rgrad = (double *)malloc(180 * double_len);
 	CalculateMatrixGrad(180, 45, &para->fc_hidden_layer2[0][0], second_grad, first_rgrad);
 	MemoryFree(second_grad);
 
-	// è®¡ç®—ReLUæ¿€æ´»å‡½æ•°çš„æ¢¯åº¦
+	// ¼ÆËãReLU¼¤»îº¯ÊıµÄÌİ¶È
 	double *first_grad;
 	first_grad = (double *)malloc(180 * double_len);
 	ReluBackPropagation(180, &data->first_fc[0][0], first_rgrad, first_grad);
 	MemoryFree(first_rgrad);
 
-	// è®¡ç®—å…¨è¿æ¥å±‚1çš„æƒé‡æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã1µÄÈ¨ÖØÌİ¶È
 	double *first_wgrad;
 	first_wgrad = (double *)malloc(207360 * double_len);
 	MatrixBackPropagationMultiply(1152, 180, &data->flatten_conv[0][0], first_grad, first_wgrad);
 
-	// è®¡ç®—å…¨è¿æ¥å±‚1çš„è¾“å…¥æ¢¯åº¦
+	// ¼ÆËãÈ«Á¬½Ó²ã1µÄÊäÈëÌİ¶È
 	double *all_conv_grad;
 	all_conv_grad = (double *)malloc(1152 * double_len);
 	CalculateMatrixGrad(1152, 180, &para->fc_hidden_layer1[0][0], first_grad, all_conv_grad);
 	MemoryFree(first_grad);
 
-	// å°†å·ç§¯å±‚çš„æ¢¯åº¦åˆ†å‰²æˆä¸¤ä¸ªé€šé“
+	// ½«¾í»ı²ãµÄÌİ¶È·Ö¸î³ÉÁ½¸öÍ¨µÀ
 	double *third_conv_grad1;
 	third_conv_grad1 = (double *)malloc(576 * double_len);
 	double *third_conv_grad2;
@@ -292,109 +292,109 @@ void backward(int label, struct parameter *para, struct result *data)
 	MatrixSplit(all_conv_grad, third_conv_grad1, third_conv_grad2);
 	MemoryFree(all_conv_grad);
 
-	// è®¡ç®—ç¬¬ä¸‰å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÈı²ã¾í»ıºËµÄÌİ¶È
 	double *third_kernel_grad;
 	third_kernel_grad = (double *)malloc(9 * double_len);
 	Conv2d(26, 26, 24, &data->sencond_conv1[0][0], third_conv_grad1, third_kernel_grad);
 
-	// ç¿»è½¬ç¬¬ä¸‰å±‚å·ç§¯æ ¸
+	// ·­×ªµÚÈı²ã¾í»ıºË
 	double *third_kernel_overturn;
 	third_kernel_overturn = (double *)malloc(9 * double_len);
 	OverturnKernel(3, &para->conv_kernel31[0][0], third_kernel_overturn);
 
-	// å¯¹ç¬¬ä¸‰å±‚å·ç§¯æ¢¯åº¦è¿›è¡Œå¡«å……
+	// ¶ÔµÚÈı²ã¾í»ıÌİ¶È½øĞĞÌî³ä
 	double *third_conv_grad_padding1;
 	third_conv_grad_padding1 = (double *)malloc(784 * double_len);
 	Padding(26, 1, third_conv_grad1, third_conv_grad_padding1);
 	MemoryFree(third_conv_grad1);
 
-	// è®¡ç®—ç¬¬äºŒå±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚ¶ş²ã¾í»ıºËµÄÌİ¶È
 	double *second_conv_grad1;
 	second_conv_grad1 = (double *)malloc(676 * double_len);
 	Conv2d(28, 28, 3, third_conv_grad_padding1, third_kernel_overturn, second_conv_grad1);
 	MemoryFree(third_kernel_overturn);
 	MemoryFree(third_conv_grad_padding1);
 
-	// è®¡ç®—ç¬¬äºŒå±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚ¶ş²ã¾í»ıºËµÄÌİ¶È
 	double *second_kernel_grad;
 	second_kernel_grad = (double *)malloc(9 * double_len);
 	Conv2d(28, 28, 26, &data->first_conv1[0][0], second_conv_grad1, second_kernel_grad);
 
-	// ç¿»è½¬ç¬¬äºŒå±‚å·ç§¯æ ¸
+	// ·­×ªµÚ¶ş²ã¾í»ıºË
 	double *second_kernel_overturn;
 	second_kernel_overturn = (double *)malloc(9 * double_len);
 	OverturnKernel(3, &para->conv_kernel21[0][0], second_kernel_overturn);
 
-	// å¯¹ç¬¬äºŒå±‚å·ç§¯æ¢¯åº¦è¿›è¡Œå¡«å……
+	// ¶ÔµÚ¶ş²ã¾í»ıÌİ¶È½øĞĞÌî³ä
 	double *second_conv_grad_padding1;
 	second_conv_grad_padding1 = (double *)malloc(900 * double_len);
 	Padding(28, 1, second_conv_grad1, second_conv_grad_padding1);
 	MemoryFree(second_conv_grad1);
 
-	// è®¡ç®—ç¬¬ä¸€å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÒ»²ã¾í»ıºËµÄÌİ¶È
 	double *first_conv_grad;
 	first_conv_grad = (double *)malloc(784 * double_len);
 	Conv2d(30, 30, 3, second_conv_grad_padding1, second_kernel_overturn, first_conv_grad);
 	MemoryFree(second_kernel_overturn);
 	MemoryFree(second_conv_grad_padding1);
 
-	// è®¡ç®—ç¬¬ä¸€å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÒ»²ã¾í»ıºËµÄÌİ¶È
 	double *first_kernel_grad;
 	first_kernel_grad = (double *)malloc(9 * double_len);
 	Conv2d(30, 30, 28, &data->mnist_data[0][0], first_conv_grad, first_kernel_grad);
 	MemoryFree(first_conv_grad);
 
-	// è®¡ç®—ç¬¬ä¸‰å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÈı²ã¾í»ıºËµÄÌİ¶È
 	double *third_kernel_grad2;
 	third_kernel_grad2 = (double *)malloc(9 * double_len);
 	Conv2d(26, 26, 24, &data->sencond_conv2[0][0], third_conv_grad2, third_kernel_grad2);
 
-	// ç¿»è½¬ç¬¬ä¸‰å±‚å·ç§¯æ ¸
+	// ·­×ªµÚÈı²ã¾í»ıºË
 	double *third_kernel_overturn2;
 	third_kernel_overturn2 = (double *)malloc(9 * double_len);
 	OverturnKernel(3, &para->conv_kernel32[0][0], third_kernel_overturn2);
 
-	// å¯¹ç¬¬ä¸‰å±‚å·ç§¯æ¢¯åº¦è¿›è¡Œå¡«å……
+	// ¶ÔµÚÈı²ã¾í»ıÌİ¶È½øĞĞÌî³ä
 	double *third_conv_grad_padding2;
 	third_conv_grad_padding2 = (double *)malloc(784 * double_len);
 	Padding(26, 1, third_conv_grad2, third_conv_grad_padding2);
 	MemoryFree(third_conv_grad2);
 
-	// è®¡ç®—ç¬¬äºŒå±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚ¶ş²ã¾í»ıºËµÄÌİ¶È
 	double *second_conv_grad2;
 	second_conv_grad2 = (double *)malloc(676 * double_len);
 	Conv2d(28, 28, 3, third_conv_grad_padding2, third_kernel_overturn2, second_conv_grad2);
 	MemoryFree(third_conv_grad_padding2);
 
-	// è®¡ç®—ç¬¬äºŒå±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚ¶ş²ã¾í»ıºËµÄÌİ¶È
 	double *second_kernel_grad2;
 	second_kernel_grad2 = (double *)malloc(9 * double_len);
 	Conv2d(28, 28, 26, &data->first_conv2[0][0], second_conv_grad2, second_kernel_grad2);
 
-	// ç¿»è½¬ç¬¬äºŒå±‚å·ç§¯æ ¸
+	// ·­×ªµÚ¶ş²ã¾í»ıºË
 	double *second_kernel_overturn2;
 	second_kernel_overturn2 = (double *)malloc(9 * double_len);
 	OverturnKernel(3, &para->conv_kernel22[0][0], second_kernel_overturn2);
 
-	// å¯¹ç¬¬äºŒå±‚å·ç§¯æ¢¯åº¦è¿›è¡Œå¡«å……
+	// ¶ÔµÚ¶ş²ã¾í»ıÌİ¶È½øĞĞÌî³ä
 	double *second_conv_grad_padding2;
 	second_conv_grad_padding2 = (double *)malloc(900 * double_len);
 	Padding(28, 1, second_conv_grad2, second_conv_grad_padding2);
 	MemoryFree(second_conv_grad2);
 
-	// è®¡ç®—ç¬¬ä¸€å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÒ»²ã¾í»ıºËµÄÌİ¶È
 	double *first_conv_grad2;
 	first_conv_grad2 = (double *)malloc(784 * double_len);
 	Conv2d(30, 30, 3, second_conv_grad_padding2, second_kernel_overturn2, first_conv_grad2);
 	MemoryFree(second_kernel_overturn2);
 	MemoryFree(second_conv_grad_padding2);
 
-	// è®¡ç®—ç¬¬ä¸€å±‚å·ç§¯æ ¸çš„æ¢¯åº¦
+	// ¼ÆËãµÚÒ»²ã¾í»ıºËµÄÌİ¶È
 	double *first_kernel_grad2;
 	first_kernel_grad2 = (double *)malloc(9 * double_len);
 	Conv2d(30, 30, 28, &data->mnist_data[0][0], first_conv_grad2, first_kernel_grad2);
 
-	// æ›´æ–°å·ç§¯æ ¸å‚æ•°
+	// ¸üĞÂ¾í»ıºË²ÎÊı
 	MatrixBackPropagation(3, 3, first_kernel_grad, &para->conv_kernel11[0][0]);
 	MatrixBackPropagation(3, 3, second_kernel_grad, &para->conv_kernel21[0][0]);
 	MatrixBackPropagation(3, 3, third_kernel_grad, &para->conv_kernel31[0][0]);
@@ -402,80 +402,80 @@ void backward(int label, struct parameter *para, struct result *data)
 	MatrixBackPropagation(3, 3, second_kernel_grad2, &para->conv_kernel22[0][0]);
 	MatrixBackPropagation(3, 3, third_kernel_grad2, &para->conv_kernel32[0][0]);
 
-	// æ›´æ–°å…¨è¿æ¥å±‚å‚æ•°
+	// ¸üĞÂÈ«Á¬½Ó²ã²ÎÊı
 	MatrixBackPropagation(1152, 180, first_wgrad, &para->fc_hidden_layer1[0][0]);
 	MatrixBackPropagation(180, 45, second_wgrad, &para->fc_hidden_layer2[0][0]);
 	MatrixBackPropagation(45, 10, out_wgrad, &para->fc_hidden_layer3[0][0]);
 
-	// é‡Šæ”¾å†…å­˜
+	// ÊÍ·ÅÄÚ´æ
 	MemoryFree(first_kernel_grad);
 	MemoryFree(second_kernel_grad);
 	MemoryFree(third_kernel_grad);
 	MemoryFree(first_kernel_grad2);
 	MemoryFree(second_kernel_grad2);
 	MemoryFree(third_kernel_grad2);
-	MemoryFree(first_wgrad);  // é‡Šæ”¾å…¨è¿æ¥å±‚1æƒé‡æ¢¯åº¦çš„å†…å­˜
-	MemoryFree(second_wgrad); // é‡Šæ”¾å…¨è¿æ¥å±‚2æƒé‡æ¢¯åº¦çš„å†…å­˜
-	MemoryFree(out_wgrad);	  // é‡Šæ”¾å…¨è¿æ¥å±‚3æƒé‡æ¢¯åº¦çš„å†…å­˜
-	return;					  // è¿”å›
+	MemoryFree(first_wgrad);  // ÊÍ·ÅÈ«Á¬½Ó²ã1È¨ÖØÌİ¶ÈµÄÄÚ´æ
+	MemoryFree(second_wgrad); // ÊÍ·ÅÈ«Á¬½Ó²ã2È¨ÖØÌİ¶ÈµÄÄÚ´æ
+	MemoryFree(out_wgrad);	  // ÊÍ·ÅÈ«Á¬½Ó²ã3È¨ÖØÌİ¶ÈµÄÄÚ´æ
+	return;					  // ·µ»Ø
 }
-// æ•°æ®åŠ è½½å‡½æ•°
+// Êı¾İ¼ÓÔØº¯Êı
 DLL_API BOOL DataLoader()
 {
 	for (int num = 0; num < 10; num++)
-	{ // éå†æ•°å­—0åˆ°9
+	{ // ±éÀúÊı×Ö0µ½9
 		for (int i = 0; i < SAMPLE_NUM; i++)
-		{												  // éå†æ¯ä¸ªæ•°å­—çš„æ ·æœ¬
-			char *e = (char *)malloc(sizeof(char) * 120); // åˆ†é…120å­—èŠ‚çš„å†…å­˜ç”¨äºå­˜å‚¨å›¾åƒæ•°æ®
-			int *l = (int *)malloc(sizeof(int) * 960);	  // åˆ†é…960ä¸ªæ•´æ•°çš„å†…å­˜ç”¨äºå­˜å‚¨äºŒå€¼åŒ–åçš„å›¾åƒæ•°æ®
+		{												  // ±éÀúÃ¿¸öÊı×ÖµÄÑù±¾
+			char *e = (char *)malloc(sizeof(char) * 120); // ·ÖÅä120×Ö½ÚµÄÄÚ´æÓÃÓÚ´æ´¢Í¼ÏñÊı¾İ
+			int *l = (int *)malloc(sizeof(int) * 960);	  // ·ÖÅä960¸öÕûÊıµÄÄÚ´æÓÃÓÚ´æ´¢¶şÖµ»¯ºóµÄÍ¼ÏñÊı¾İ
 			if (e == NULL || l == NULL)
-			{ // æ£€æŸ¥å†…å­˜åˆ†é…æ˜¯å¦æˆåŠŸ
-				perror("å†…å­˜åˆ†é…å¤±è´¥ï¼\n");
-				free(e);	  // é‡Šæ”¾å·²åˆ†é…çš„å†…å­˜
-				free(l);	  // é‡Šæ”¾å·²åˆ†é…çš„å†…å­˜
-				return FALSE; // è¿”å›FALSEè¡¨ç¤ºå†…å­˜åˆ†é…å¤±è´¥
+			{ // ¼ì²éÄÚ´æ·ÖÅäÊÇ·ñ³É¹¦
+				perror("ÄÚ´æ·ÖÅäÊ§°Ü£¡\n");
+				free(e);	  // ÊÍ·ÅÒÑ·ÖÅäµÄÄÚ´æ
+				free(l);	  // ÊÍ·ÅÒÑ·ÖÅäµÄÄÚ´æ
+				return FALSE; // ·µ»ØFALSE±íÊ¾ÄÚ´æ·ÖÅäÊ§°Ü
 			}
 
-			char route_name[50] = "Training_set/"; // å®šä¹‰è®­ç»ƒé›†æ–‡ä»¶è·¯å¾„
+			char route_name[50] = "Training_set/"; // ¶¨ÒåÑµÁ·¼¯ÎÄ¼şÂ·¾¶
 			char file_name[15];
-			sprintf(file_name, "%d/%d.bmp", num, i + 1); // ç”Ÿæˆæ–‡ä»¶å
-			strcat(route_name, file_name);				 // æ‹¼æ¥æ–‡ä»¶è·¯å¾„
+			sprintf(file_name, "%d/%d.bmp", num, i + 1); // Éú³ÉÎÄ¼şÃû
+			strcat(route_name, file_name);				 // Æ´½ÓÎÄ¼şÂ·¾¶
 
-			FILE *fp = fopen(route_name, "rb"); // æ‰“å¼€æ–‡ä»¶
+			FILE *fp = fopen(route_name, "rb"); // ´ò¿ªÎÄ¼ş
 			if (!fp)
-			{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€
-				perror("æœªèƒ½æ‰“å¼€è®­ç»ƒé›†æ•°æ®. æ£€æŸ¥'Training_set'æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨ï¼Œå¹¶ä¸”æ–‡ä»¶å¤¹ä¸­æœ‰å›¾ç‰‡!\n");
-				free(e); // é‡Šæ”¾å·²åˆ†é…çš„å†…å­˜
+			{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª
+				perror("Î´ÄÜ´ò¿ªÑµÁ·¼¯Êı¾İ. ¼ì²é'Training_set'ÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ£¬²¢ÇÒÎÄ¼ş¼ĞÖĞÓĞÍ¼Æ¬!\n");
+				free(e); // ÊÍ·ÅÒÑ·ÖÅäµÄÄÚ´æ
 				free(l);
-				return FALSE; // è¿”å›FALSEè¡¨ç¤ºæ–‡ä»¶æ‰“å¼€å¤±è´¥
+				return FALSE; // ·µ»ØFALSE±íÊ¾ÎÄ¼ş´ò¿ªÊ§°Ü
 			}
 
-			fseek(fp, 62, SEEK_SET);		 // è·³è¿‡æ–‡ä»¶å¤´éƒ¨çš„62å­—èŠ‚
-			fread(e, sizeof(char), 120, fp); // è¯»å–120å­—èŠ‚çš„å›¾åƒæ•°æ®
-			fclose(fp);						 // å…³é—­æ–‡ä»¶
-			// TODO è½¬ä¸ºäºŒè¿›åˆ¶
-			// XXX è¾“å…¥ä¸º30x30æ— ç°åº¦bmpå›¾
+			fseek(fp, 62, SEEK_SET);		 // Ìø¹ıÎÄ¼şÍ·²¿µÄ62×Ö½Ú
+			fread(e, sizeof(char), 120, fp); // ¶ÁÈ¡120×Ö½ÚµÄÍ¼ÏñÊı¾İ
+			fclose(fp);						 // ¹Ø±ÕÎÄ¼ş
+			// TODO ×ªÎª¶ş½øÖÆ
+			// XXX ÊäÈëÎª30x30ÎŞ»Ò¶ÈbmpÍ¼
 			int y = 0;
 			for (int r = 0; r < 120; r++)
-			{ // éå†è¯»å–çš„å›¾åƒæ•°æ®
+			{ // ±éÀú¶ÁÈ¡µÄÍ¼ÏñÊı¾İ
 				for (int u = 1; u < 9; u++)
-				{											// éå†æ¯ä¸ªå­—èŠ‚çš„æ¯ä¸€ä½
-					l[y] = (int)((e[r] >> (8 - u)) & 0x01); // å°†æ¯ä¸€ä½è½¬æ¢ä¸ºäºŒå€¼åŒ–æ•°æ®
+				{											// ±éÀúÃ¿¸ö×Ö½ÚµÄÃ¿Ò»Î»
+					l[y] = (int)((e[r] >> (8 - u)) & 0x01); // ½«Ã¿Ò»Î»×ª»»Îª¶şÖµ»¯Êı¾İ
 					y++;
 					if (y > 960)
 						break;
 				}
 			}
-			// TODO å­˜å‚¨äºŒè¿›åˆ¶åˆ°Sample
+			// TODO ´æ´¢¶ş½øÖÆµ½Sample
 			int g = 0;
 			for (int u = 0; u < 30; u++)
-			{ // éå†0-29(1-30)è¡Œ
+			{ // ±éÀú0-29(1-30)ĞĞ
 				y = 0;
 				for (int j = 0; j < 32; j++)
-				{ // éå†0-29(1-30)åˆ—
+				{ // ±éÀú0-29(1-30)ÁĞ
 					if (j != 30 && j != 31)
-					{												 // è·³è¿‡ç¬¬30å’Œç¬¬31åˆ—
-						Sample[num * SAMPLE_NUM + i].a[u][y] = l[g]; // å°†äºŒå€¼åŒ–æ•°æ®å­˜å‚¨åˆ°æ ·æœ¬æ•°ç»„ä¸­
+					{												 // Ìø¹ıµÚ30ºÍµÚ31ÁĞ
+						Sample[num * SAMPLE_NUM + i].a[u][y] = l[g]; // ½«¶şÖµ»¯Êı¾İ´æ´¢µ½Ñù±¾Êı×éÖĞ
 						y++;
 					}
 					g++;
@@ -486,8 +486,8 @@ DLL_API BOOL DataLoader()
 			if (q == 1)
 			{
 
-				// TODO whyå¦‚æœç¬¬ä¸€ä¸ªåƒç´ ä¸º1ï¼Œåˆ™å°†å›¾åƒæ•°æ®å–å
-				// å¦‚æœç¬¬ä¸€ä¸ªåƒç´ ä¸º1ï¼Œåˆ™å°†å›¾åƒæ•°æ®å–å
+				// TODO whyÈç¹ûµÚÒ»¸öÏñËØÎª1£¬Ôò½«Í¼ÏñÊı¾İÈ¡·´
+				// Èç¹ûµÚÒ»¸öÏñËØÎª1£¬Ôò½«Í¼ÏñÊı¾İÈ¡·´
 				for (int b = 0; b < 30; b++)
 				{
 					for (int n = 0; n < 30; n++)
@@ -497,86 +497,88 @@ DLL_API BOOL DataLoader()
 				}
 			}
 
-			Sample[num * SAMPLE_NUM + i].number = num; // è®¾ç½®æ ·æœ¬çš„æ ‡ç­¾
-			free(e);								   // é‡Šæ”¾å·²åˆ†é…çš„å†…å­˜
+			Sample[num * SAMPLE_NUM + i].number = num; // ÉèÖÃÑù±¾µÄ±êÇ©
+			free(e);								   // ÊÍ·ÅÒÑ·ÖÅäµÄÄÚ´æ
 			free(l);
 		}
 	}
-	return TRUE; // è¿”å›TRUEè¡¨ç¤ºæ•°æ®åŠ è½½æˆåŠŸ
+	return TRUE; // ·µ»ØTRUE±íÊ¾Êı¾İ¼ÓÔØ³É¹¦
 }
 
-// è¯»å–ç½‘ç»œå‚æ•°æ–‡ä»¶å‡½æ•°
+// ¶ÁÈ¡ÍøÂç²ÎÊıÎÄ¼şº¯Êı
 DLL_API BOOL read_file(struct parameter *parameter_dest)
 {
+	system("chcp 65001");
 	FILE *fp;
-	fp = fopen("network_parameter.txt", "rb"); // ä»¥äºŒè¿›åˆ¶æ¨¡å¼æ‰“å¼€ç½‘ç»œå‚æ•°æ–‡ä»¶
+	fp = fopen("network_parameter.txt", "rb"); // ÒÔ¶ş½øÖÆÄ£Ê½´ò¿ªÍøÂç²ÎÊıÎÄ¼ş
 	if (fp == NULL)
-	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€
-		printf("æ–‡ä»¶æ‰“å¼€å¤±è´¥ï¼Œè¯·æ£€æŸ¥ç½‘ç»œå‚æ•°æ–‡ä»¶æ˜¯å¦åœ¨è®­ç»ƒé›†æ–‡ä»¶å¤¹å†…ï¼\n");
-		return FALSE; // è¿”å›FALSEè¡¨ç¤ºæ–‡ä»¶æ‰“å¼€å¤±è´¥
+	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª
+		printf("ÎÄ¼ş´ò¿ªÊ§°Ü£¬Çë¼ì²éÍøÂç²ÎÊıÎÄ¼şÊÇ·ñÔÚÑµÁ·¼¯ÎÄ¼ş¼ĞÄÚ£¡\n");
+		return FALSE; // ·µ»ØFALSE±íÊ¾ÎÄ¼ş´ò¿ªÊ§°Ü
 	}
 	struct parameter *parameter_tmp = NULL;
-	parameter_tmp = (struct parameter *)malloc(sizeof(struct parameter)); // åˆ†é…å†…å­˜ç”¨äºä¸´æ—¶å­˜å‚¨ç½‘ç»œå‚æ•°
-	fread(parameter_tmp, sizeof(struct parameter), 1, fp);				  // ä»æ–‡ä»¶ä¸­è¯»å–ç½‘ç»œå‚æ•°
-	(*parameter_dest) = (*parameter_tmp);								  // å°†è¯»å–çš„ç½‘ç»œå‚æ•°èµ‹å€¼ç»™ç›®æ ‡å‚æ•°
-	fclose(fp);															  // å…³é—­æ–‡ä»¶
-	free(parameter_tmp);												  // é‡Šæ”¾ä¸´æ—¶å­˜å‚¨çš„å†…å­˜
+	parameter_tmp = (struct parameter *)malloc(sizeof(struct parameter)); // ·ÖÅäÄÚ´æÓÃÓÚÁÙÊ±´æ´¢ÍøÂç²ÎÊı
+	fread(parameter_tmp, sizeof(struct parameter), 1, fp);				  // ´ÓÎÄ¼şÖĞ¶ÁÈ¡ÍøÂç²ÎÊı
+	(*parameter_dest) = (*parameter_tmp);								  // ½«¶ÁÈ¡µÄÍøÂç²ÎÊı¸³Öµ¸øÄ¿±ê²ÎÊı
+	fclose(fp);															  // ¹Ø±ÕÎÄ¼ş
+	free(parameter_tmp);												  // ÊÍ·ÅÁÙÊ±´æ´¢µÄÄÚ´æ
 	parameter_tmp = NULL;
 
-	return TRUE; // è¿”å›TRUEè¡¨ç¤ºæ–‡ä»¶è¯»å–æˆåŠŸ
+	return TRUE; // ·µ»ØTRUE±íÊ¾ÎÄ¼ş¶ÁÈ¡³É¹¦
 }
 
-// å°†ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶å‡½æ•°
+// ½«ÍøÂç²ÎÊıĞ´ÈëÎÄ¼şº¯Êı
 DLL_API BOOL write_para_to_file(struct parameter *parameter_file)
 {
 	FILE *fp;
-	fp = fopen("network_parameter.txt", "wb"); // ä»¥äºŒè¿›åˆ¶æ¨¡å¼æ‰“å¼€ç½‘ç»œå‚æ•°æ–‡ä»¶
+	fp = fopen("network_parameter.txt", "wb"); // ÒÔ¶ş½øÖÆÄ£Ê½´ò¿ªÍøÂç²ÎÊıÎÄ¼ş
 	struct parameter *parameter_tmp;
-	parameter_tmp = (struct parameter *)malloc(sizeof(struct parameter)); // åˆ†é…å†…å­˜ç”¨äºä¸´æ—¶å­˜å‚¨ç½‘ç»œå‚æ•°
+	parameter_tmp = (struct parameter *)malloc(sizeof(struct parameter)); // ·ÖÅäÄÚ´æÓÃÓÚÁÙÊ±´æ´¢ÍøÂç²ÎÊı
 
-	(*parameter_tmp) = (*parameter_file);					// å°†ç½‘ç»œå‚æ•°èµ‹å€¼ç»™ä¸´æ—¶å‚æ•°
-	fwrite(parameter_tmp, sizeof(struct parameter), 1, fp); // å°†ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶
+	(*parameter_tmp) = (*parameter_file);					// ½«ÍøÂç²ÎÊı¸³Öµ¸øÁÙÊ±²ÎÊı
+	fwrite(parameter_tmp, sizeof(struct parameter), 1, fp); // ½«ÍøÂç²ÎÊıĞ´ÈëÎÄ¼ş
 
-	fclose(fp);			 // å…³é—­æ–‡ä»¶
-	free(parameter_tmp); // é‡Šæ”¾ä¸´æ—¶å­˜å‚¨çš„å†…å­˜
+	fclose(fp);			 // ¹Ø±ÕÎÄ¼ş
+	free(parameter_tmp); // ÊÍ·ÅÁÙÊ±´æ´¢µÄÄÚ´æ
 	parameter_tmp = NULL;
 
-	return TRUE; // è¿”å›TRUEè¡¨ç¤ºæ–‡ä»¶å†™å…¥æˆåŠŸ
+	return TRUE; // ·µ»ØTRUE±íÊ¾ÎÄ¼şĞ´Èë³É¹¦
 }
 
-// æ‰“å°ç½‘ç»œå‚æ•°åˆ°æ–‡ä»¶å‡½æ•°
+// ´òÓ¡ÍøÂç²ÎÊıµ½ÎÄ¼şº¯Êı
 void printf_file2(struct parameter *parameter4)
 {
 	FILE *fp;
-	fp = fopen("NetworkParameters.bin", "wb"); // ä»¥äºŒè¿›åˆ¶æ¨¡å¼æ‰“å¼€ç½‘ç»œå‚æ•°æ–‡ä»¶
+	fp = fopen("NetworkParameters.bin", "wb"); // ÒÔ¶ş½øÖÆÄ£Ê½´ò¿ªÍøÂç²ÎÊıÎÄ¼ş
 	struct parameter *parameter1;
-	parameter1 = (struct parameter *)malloc(sizeof(struct parameter)); // åˆ†é…å†…å­˜ç”¨äºä¸´æ—¶å­˜å‚¨ç½‘ç»œå‚æ•°
-	(*parameter1) = (*parameter4);									   // å°†ç½‘ç»œå‚æ•°èµ‹å€¼ç»™ä¸´æ—¶å‚æ•°
-	fwrite(parameter1, sizeof(struct parameter), 1, fp);			   // å°†ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶
-	fclose(fp);														   // å…³é—­æ–‡ä»¶
-	free(parameter1);												   // é‡Šæ”¾ä¸´æ—¶å­˜å‚¨çš„å†…å­˜
+	parameter1 = (struct parameter *)malloc(sizeof(struct parameter)); // ·ÖÅäÄÚ´æÓÃÓÚÁÙÊ±´æ´¢ÍøÂç²ÎÊı
+	(*parameter1) = (*parameter4);									   // ½«ÍøÂç²ÎÊı¸³Öµ¸øÁÙÊ±²ÎÊı
+	fwrite(parameter1, sizeof(struct parameter), 1, fp);			   // ½«ÍøÂç²ÎÊıĞ´ÈëÎÄ¼ş
+	fclose(fp);														   // ¹Ø±ÕÎÄ¼ş
+	free(parameter1);												   // ÊÍ·ÅÁÙÊ±´æ´¢µÄÄÚ´æ
 	parameter1 = NULL;
 	return;
 }
 
-// äº¤å‰ç†µæŸå¤±å‡½æ•°
+// ½»²æìØËğÊ§º¯Êı
 double Cross_entropy(double *a, int m)
 {
 	double u = 0;
-	u = (-log10(a[m])); // è®¡ç®—äº¤å‰ç†µæŸå¤±
+	u = (-log10(a[m])); // ¼ÆËã½»²æìØËğÊ§
 	return u;
 }
 
-// æ˜¾ç¤ºè¿›åº¦æ¡å‡½æ•°
+// ÏÔÊ¾½ø¶ÈÌõº¯Êı
 void show_progress_bar(int progress, int total)
 {
-	int bar_width = 50;								  // è¿›åº¦æ¡å®½åº¦
-	float percent_complete = (float)progress / total; // è®¡ç®—å®Œæˆç™¾åˆ†æ¯”
-	int position = bar_width * percent_complete;	  // è®¡ç®—è¿›åº¦æ¡ä½ç½®
+	system("chcp 65001");
+	int bar_width = 50;								  // ½ø¶ÈÌõ¿í¶È
+	float percent_complete = (float)progress / total; // ¼ÆËãÍê³É°Ù·Ö±È
+	int position = bar_width * percent_complete;	  // ¼ÆËã½ø¶ÈÌõÎ»ÖÃ
 
 	printf("[");
 	for (int i = 0; i < bar_width; ++i)
-	{ // ç»˜åˆ¶è¿›åº¦æ¡
+	{ // »æÖÆ½ø¶ÈÌõ
 		if (i < position)
 		{
 			printf("=");
@@ -590,37 +592,38 @@ void show_progress_bar(int progress, int total)
 			printf(" ");
 		}
 	}
-	printf("] %d%%\r", (int)(percent_complete * 100)); // æ˜¾ç¤ºç™¾åˆ†æ¯”
-	fflush(stdout);									   // åˆ·æ–°è¾“å‡ºç¼“å†²åŒº
+	printf("] %d%%\r", (int)(percent_complete * 100)); // ÏÔÊ¾°Ù·Ö±È
+	fflush(stdout);									   // Ë¢ĞÂÊä³ö»º³åÇø
 }
 
-// important è®­ç»ƒï¼Œå­¦ä¹ 
+// important ÑµÁ·£¬Ñ§Ï°
 DLL_API void train(int epochs, struct parameter *para, struct result *data)
 {
-	double corss_loss = 2;						 // åˆå§‹åŒ–äº¤å‰ç†µæŸå¤±
-	for (int epoch = 0; epoch < epochs; epoch++) // éå†æ¯ä¸ªè®­ç»ƒå‘¨æœŸ
+	system("chcp 65001");
+	double corss_loss = 2;						 // ³õÊ¼»¯½»²æìØËğÊ§
+	for (int epoch = 0; epoch < epochs; epoch++) // ±éÀúÃ¿¸öÑµÁ·ÖÜÆÚ
 	{
-		lr = pow((corss_loss / 10), 1.7); // æ ¹æ®äº¤å‰ç†µæŸå¤±è®¡ç®—å­¦ä¹ ç‡
-		if (lr > 0.01)					  // é™åˆ¶å­¦ä¹ ç‡çš„æœ€å¤§å€¼
+		lr = pow((corss_loss / 10), 1.7); // ¸ù¾İ½»²æìØËğÊ§¼ÆËãÑ§Ï°ÂÊ
+		if (lr > 0.01)					  // ÏŞÖÆÑ§Ï°ÂÊµÄ×î´óÖµ
 		{
 			lr = 0.01;
 		}
 
-		show_progress_bar(epoch + 1, epochs); // æ˜¾ç¤ºè®­ç»ƒè¿›åº¦æ¡
-		if ((epoch + 1) % 10 == 0)			  // æ¯10ä¸ªå‘¨æœŸè¾“å‡ºä¸€æ¬¡äº¤å‰ç†µæŸå¤±å’Œå­¦ä¹ ç‡
+		show_progress_bar(epoch + 1, epochs); // ÏÔÊ¾ÑµÁ·½ø¶ÈÌõ
+		if ((epoch + 1) % 10 == 0)			  // Ã¿10¸öÖÜÆÚÊä³öÒ»´Î½»²æìØËğÊ§ºÍÑ§Ï°ÂÊ
 		{
-			fflush(stdout); // åˆ·æ–°è¾“å‡ºç¼“å†²åŒº
-			printf("\täº¤å‰ç†µæŸå¤±: %lf  å­¦ä¹ ç‡:%.10lf\n", corss_loss, lr);
-			if (lr < 0.0000000001) // å¦‚æœå­¦ä¹ ç‡è¿‡å°ï¼Œåˆ™ä¿å­˜ç½‘ç»œå‚æ•°
+			fflush(stdout); // Ë¢ĞÂÊä³ö»º³åÇø
+			printf("\t½»²æìØËğÊ§: %lf  Ñ§Ï°ÂÊ:%.10lf\n", corss_loss, lr);
+			if (lr < 0.0000000001) // Èç¹ûÑ§Ï°ÂÊ¹ıĞ¡£¬Ôò±£´æÍøÂç²ÎÊı
 				printf_file2(para);
 		}
 
-		// éšæœºäº¤æ¢æ ·æœ¬ï¼Œæ‰“ä¹±é¡ºåº
+		// Ëæ»ú½»»»Ñù±¾£¬´òÂÒË³Ğò
 		int a, b;
-		srand(time(NULL)); // åˆå§‹åŒ–éšæœºæ•°ç§å­
+		srand(time(NULL)); // ³õÊ¼»¯Ëæ»úÊıÖÖ×Ó
 		struct sample *sample_tmp = NULL;
-		sample_tmp = (struct sample *)malloc(sizeof(struct sample)); // åˆ†é…å†…å­˜ç”¨äºä¸´æ—¶å­˜å‚¨æ ·æœ¬
-		for (int q = 0; q < SAMPLE_NUM * 10; q++)					 // éšæœºäº¤æ¢æ ·æœ¬
+		sample_tmp = (struct sample *)malloc(sizeof(struct sample)); // ·ÖÅäÄÚ´æÓÃÓÚÁÙÊ±´æ´¢Ñù±¾
+		for (int q = 0; q < SAMPLE_NUM * 10; q++)					 // Ëæ»ú½»»»Ñù±¾
 		{
 			a = (int)((rand() / (RAND_MAX + 1.0)) * 300);
 			b = (int)((rand() / (RAND_MAX + 1.0)) * 300);
@@ -634,18 +637,18 @@ DLL_API void train(int epochs, struct parameter *para, struct result *data)
 				continue;
 		}
 
-		for (int i = 0; i < SAMPLE_NUM * 10; i++) // éå†æ¯ä¸ªæ ·æœ¬
+		for (int i = 0; i < SAMPLE_NUM * 10; i++) // ±éÀúÃ¿¸öÑù±¾
 		{
-			corss_loss = 0; // åˆå§‹åŒ–äº¤å‰ç†µæŸå¤±
+			corss_loss = 0; // ³õÊ¼»¯½»²æìØËğÊ§
 			(*sample_tmp) = Sample[i];
-			int y = sample_tmp->number;					   // è·å–æ ·æœ¬æ ‡ç­¾
-			forward(&sample_tmp->a[0][0], para, data);	   // å‰å‘ä¼ æ’­
-			backward(y, para, data);					   // åå‘ä¼ æ’­
-			double g = Cross_entropy(&data->result[0], y); // è®¡ç®—äº¤å‰ç†µæŸå¤±
+			int y = sample_tmp->number;					   // »ñÈ¡Ñù±¾±êÇ©
+			forward(&sample_tmp->a[0][0], para, data);	   // Ç°Ïò´«²¥
+			backward(y, para, data);					   // ·´Ïò´«²¥
+			double g = Cross_entropy(&data->result[0], y); // ¼ÆËã½»²æìØËğÊ§
 			if (g > corss_loss)
-				corss_loss = g; // æ›´æ–°äº¤å‰ç†µæŸå¤±
+				corss_loss = g; // ¸üĞÂ½»²æìØËğÊ§
 		}
-		free(sample_tmp); // é‡Šæ”¾ä¸´æ—¶å­˜å‚¨çš„æ ·æœ¬å†…å­˜
+		free(sample_tmp); // ÊÍ·ÅÁÙÊ±´æ´¢µÄÑù±¾ÄÚ´æ
 		sample_tmp = NULL;
 	}
 	printf("\n");
@@ -654,31 +657,32 @@ DLL_API void train(int epochs, struct parameter *para, struct result *data)
 
 DLL_API void test_network(struct parameter *parameter2, struct result *data2)
 {
+	system("chcp 65001");
 	setlocale(LC_ALL, "");
 	char e[120];
 	int l[960];
 	double data[30][30];
-	for (int i = 0; i < 10; i++) // éå†æ¯ä¸ªæµ‹è¯•æ ·æœ¬
+	for (int i = 0; i < 10; i++) // ±éÀúÃ¿¸ö²âÊÔÑù±¾
 	{
 		FILE *fp;
 		char s[30];
-		sprintf(s, "%s%d%s", "Test_set/", i, ".bmp"); // ç”Ÿæˆæµ‹è¯•æ ·æœ¬æ–‡ä»¶å
-		printf("\næ‰“å¼€çš„æ–‡ä»¶å:%s", s);
-		fp = fopen(s, "rb"); // æ‰“å¼€æµ‹è¯•æ ·æœ¬æ–‡ä»¶
+		sprintf(s, "%s%d%s", "Test_set/", i, ".bmp"); // Éú³É²âÊÔÑù±¾ÎÄ¼şÃû
+		printf("\n´ò¿ªµÄÎÄ¼şÃû:%s", s);
+		fp = fopen(s, "rb"); // ´ò¿ª²âÊÔÑù±¾ÎÄ¼ş
 		if (!fp)
 		{
-			perror("ä¸èƒ½æ‰“å¼€æ–‡ä»¶!\n");
+			perror("²»ÄÜ´ò¿ªÎÄ¼ş!\n");
 			return;
 		}
-		fseek(fp, 62, SEEK_SET);		 // è·³è¿‡æ–‡ä»¶å¤´éƒ¨çš„62å­—èŠ‚
-		fread(e, sizeof(char), 120, fp); // è¯»å–120å­—èŠ‚çš„å›¾åƒæ•°æ®
+		fseek(fp, 62, SEEK_SET);		 // Ìø¹ıÎÄ¼şÍ·²¿µÄ62×Ö½Ú
+		fread(e, sizeof(char), 120, fp); // ¶ÁÈ¡120×Ö½ÚµÄÍ¼ÏñÊı¾İ
 		fclose(fp);
 		int y = 0;
-		for (int r = 0; r < 120; r++) // éå†è¯»å–çš„å›¾åƒæ•°æ®
+		for (int r = 0; r < 120; r++) // ±éÀú¶ÁÈ¡µÄÍ¼ÏñÊı¾İ
 		{
-			for (int u = 1; u < 9; u++) // éå†æ¯ä¸ªå­—èŠ‚çš„æ¯ä¸€ä½
+			for (int u = 1; u < 9; u++) // ±éÀúÃ¿¸ö×Ö½ÚµÄÃ¿Ò»Î»
 			{
-				l[y] = (int)((e[r]) >> (8 - u) & 0x01); // å°†æ¯ä¸€ä½è½¬æ¢ä¸ºäºŒå€¼åŒ–æ•°æ®
+				l[y] = (int)((e[r]) >> (8 - u) & 0x01); // ½«Ã¿Ò»Î»×ª»»Îª¶şÖµ»¯Êı¾İ
 				y++;
 				if (y > 960)
 					break;
@@ -686,21 +690,21 @@ DLL_API void test_network(struct parameter *parameter2, struct result *data2)
 		};
 		y = 0;
 		int g = 0;
-		for (int u = 0; u < 30; u++) // éå†30è¡Œ
+		for (int u = 0; u < 30; u++) // ±éÀú30ĞĞ
 		{
 			y = 0;
-			for (int j = 0; j < 32; j++) // éå†32åˆ—
+			for (int j = 0; j < 32; j++) // ±éÀú32ÁĞ
 			{
-				if ((j != 30) && (j != 31)) // è·³è¿‡ç¬¬30å’Œç¬¬31åˆ—
+				if ((j != 30) && (j != 31)) // Ìø¹ıµÚ30ºÍµÚ31ÁĞ
 				{
-					data[u][y] = l[g]; // å°†äºŒå€¼åŒ–æ•°æ®å­˜å‚¨åˆ°æ ·æœ¬æ•°ç»„ä¸­
+					data[u][y] = l[g]; // ½«¶şÖµ»¯Êı¾İ´æ´¢µ½Ñù±¾Êı×éÖĞ
 					y++;
 				};
 				g++;
 			}
 		}
 		int q = data[0][0];
-		if (q == 1) // å¦‚æœç¬¬ä¸€ä¸ªåƒç´ ä¸º1ï¼Œåˆ™å°†å›¾åƒæ•°æ®å–å
+		if (q == 1) // Èç¹ûµÚÒ»¸öÏñËØÎª1£¬Ôò½«Í¼ÏñÊı¾İÈ¡·´
 		{
 			int n = 0;
 			int z = 0;
@@ -720,125 +724,125 @@ DLL_API void test_network(struct parameter *parameter2, struct result *data2)
 				z++;
 			}
 		}
-		forward(&data[0][0], parameter2, data2); // å‰å‘ä¼ æ’­
+		forward(&data[0][0], parameter2, data2); // Ç°Ïò´«²¥
 
 		double sum = 0;
 		int k = 0;
-		for (int j = 0; j < 10; j++) // éå†æ¯ä¸ªç±»åˆ«
+		for (int j = 0; j < 10; j++) // ±éÀúÃ¿¸öÀà±ğ
 		{
 			if (result[j] > sum)
 			{
 				sum = result[j];
-				k = j; // æ‰¾åˆ°æ¦‚ç‡æœ€å¤§çš„ç±»åˆ«
+				k = j; // ÕÒµ½¸ÅÂÊ×î´óµÄÀà±ğ
 			}
 			else
 				continue;
 		}
 		printf("\n");
-		for (int i = 0; i < 10; i++) // è¾“å‡ºæ¯ä¸ªç±»åˆ«çš„é¢„æµ‹æ¦‚ç‡
+		for (int i = 0; i < 10; i++) // Êä³öÃ¿¸öÀà±ğµÄÔ¤²â¸ÅÂÊ
 		{
-			printf("\té¢„æµ‹å€¼æ˜¯%dçš„æ¦‚ç‡ï¼š%lf\n", i, result[i]);
+			printf("\tÔ¤²âÖµÊÇ%dµÄ¸ÅÂÊ£º%lf\n", i, result[i]);
 		}
 
-		printf("\033[1;31;43mæœ€ç»ˆé¢„æµ‹å€¼: %d \033[0m\n", k); // è¾“å‡ºæœ€ç»ˆé¢„æµ‹ç»“æœ
+		printf("\033[1;31;43m×îÖÕÔ¤²âÖµ: %d \033[0m\n", k); // Êä³ö×îÖÕÔ¤²â½á¹û
 	}
 	return;
 }
 
 // int main(int argc, char const *argv[])
 // {
-// 	// æ§åˆ¶å°è¾“å‡ºutf8
+// 	// ¿ØÖÆÌ¨Êä³öutf8
 // 	system("chcp 65001");
-// 	int h = DataLoader(); // åŠ è½½è®­ç»ƒæ•°æ®
+// 	int h = DataLoader(); // ¼ÓÔØÑµÁ·Êı¾İ
 // 	if (h == TRUE)
 // 	{
-// 		printf("è®­ç»ƒæ•°æ®è¯»å–æˆåŠŸï¼\n");
+// 		printf("ÑµÁ·Êı¾İ¶ÁÈ¡³É¹¦£¡\n");
 // 	}
 // 	else if (h == FALSE)
 // 	{
-// 		printf("è®­ç»ƒé›†è¯»å–å¤±è´¥ï¼ç¨‹åºè‡ªåŠ¨é€€å‡º\n");
+// 		printf("ÑµÁ·¼¯¶ÁÈ¡Ê§°Ü£¡³ÌĞò×Ô¶¯ÍË³ö\n");
 // 		return 0;
 // 	}
 
 // 	printf("=============================================\n");
-// 	printf("å¼€å§‹è®­ç»ƒç½‘ç»œ\n");
-// 	// å‚æ•°,åˆ†é…åˆ°å †ä¸Šçš„å‚æ•°
+// 	printf("¿ªÊ¼ÑµÁ·ÍøÂç\n");
+// 	// ²ÎÊı,·ÖÅäµ½¶ÑÉÏµÄ²ÎÊı
 // 	struct parameter *storage;
-// 	(storage) = (struct parameter *)malloc(sizeof(struct parameter)); // åˆ†é…å†…å­˜ç”¨äºå­˜å‚¨ç½‘ç»œå‚æ•°
+// 	(storage) = (struct parameter *)malloc(sizeof(struct parameter)); // ·ÖÅäÄÚ´æÓÃÓÚ´æ´¢ÍøÂç²ÎÊı
 // 	struct result *data;
-// 	(data) = (struct result *)malloc(sizeof(struct result)); // åˆ†é…å†…å­˜ç”¨äºå­˜å‚¨ç»“æœ
+// 	(data) = (struct result *)malloc(sizeof(struct result)); // ·ÖÅäÄÚ´æÓÃÓÚ´æ´¢½á¹û
 
-// 	// XXX æ¶ˆæ¯å¾ªç¯
+// 	// XXX ÏûÏ¢Ñ­»·
 // 	char g;
 // 	do
 // 	{
-// 		printf("è¯·é—®æ‚¨æ˜¯å¦å¸Œæœ›ä»å·²è®­ç»ƒçš„ç½‘ç»œå‚æ•°æ–‡ä»¶ä¸­è¯»å–ç½‘ç»œå‚æ•°ï¼Ÿ(æ˜¯è¯·æŒ‰ yï¼Œå¦è¯·æŒ‰ n): ");
-// 		setbuf(stdin, NULL);	  // æ¸…ç©ºè¾“å…¥ç¼“å†²åŒº
-// 		g = getchar();			  // è·å–ç”¨æˆ·è¾“å…¥
-// 		while (getchar() != '\n') // æ¸…ç©ºè¾“å…¥ç¼“å†²åŒºä¸­çš„å‰©ä½™å­—ç¬¦
+// 		printf("ÇëÎÊÄúÊÇ·ñÏ£Íû´ÓÒÑÑµÁ·µÄÍøÂç²ÎÊıÎÄ¼şÖĞ¶ÁÈ¡ÍøÂç²ÎÊı£¿(ÊÇÇë°´ y£¬·ñÇë°´ n): ");
+// 		setbuf(stdin, NULL);	  // Çå¿ÕÊäÈë»º³åÇø
+// 		g = getchar();			  // »ñÈ¡ÓÃ»§ÊäÈë
+// 		while (getchar() != '\n') // Çå¿ÕÊäÈë»º³åÇøÖĞµÄÊ£Óà×Ö·û
 // 			;
-// 		if (g == 'y') // å¦‚æœç”¨æˆ·è¾“å…¥ 'y'
+// 		if (g == 'y') // Èç¹ûÓÃ»§ÊäÈë 'y'
 // 		{
-// 			int h = read_file(storage); // å°è¯•è¯»å–ç½‘ç»œå‚æ•°æ–‡ä»¶
-// 			if (h == FALSE)				// å¦‚æœè¯»å–å¤±è´¥
+// 			int h = read_file(storage); // ³¢ÊÔ¶ÁÈ¡ÍøÂç²ÎÊıÎÄ¼ş
+// 			if (h == FALSE)				// Èç¹û¶ÁÈ¡Ê§°Ü
 // 			{
-// 				printf("å‚æ•°åŒ…ä¸å­˜åœ¨ï¼å¼€å§‹è‡ªåŠ¨éšæœºåˆå§‹åŒ–ç½‘ç»œå‚æ•°\n");
-// 				init(storage);				 // éšæœºåˆå§‹åŒ–ç½‘ç»œå‚æ•°
-// 				write_para_to_file(storage); // å°†åˆå§‹åŒ–çš„ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶
-// 				printf("ç½‘ç»œå‚æ•°åˆå§‹åŒ–å®Œæ¯•ï¼\n");
-// 				printf("ç½‘ç»œå‚æ•°å·²ä¿å­˜åˆ° network_parameter.txt æ–‡ä»¶ä¸­\n");
+// 				printf("²ÎÊı°ü²»´æÔÚ£¡¿ªÊ¼×Ô¶¯Ëæ»ú³õÊ¼»¯ÍøÂç²ÎÊı\n");
+// 				init(storage);				 // Ëæ»ú³õÊ¼»¯ÍøÂç²ÎÊı
+// 				write_para_to_file(storage); // ½«³õÊ¼»¯µÄÍøÂç²ÎÊıĞ´ÈëÎÄ¼ş
+// 				printf("ÍøÂç²ÎÊı³õÊ¼»¯Íê±Ï£¡\n");
+// 				printf("ÍøÂç²ÎÊıÒÑ±£´æµ½ network_parameter.txt ÎÄ¼şÖĞ\n");
 // 			}
-// 			else if (h == TRUE) // å¦‚æœè¯»å–æˆåŠŸ
+// 			else if (h == TRUE) // Èç¹û¶ÁÈ¡³É¹¦
 // 			{
-// 				printf("å‚æ•°è¯»å–æˆåŠŸ!\n");
+// 				printf("²ÎÊı¶ÁÈ¡³É¹¦!\n");
 // 			}
 // 		}
-// 		else if (g == 'n') // å¦‚æœç”¨æˆ·è¾“å…¥ 'n'
+// 		else if (g == 'n') // Èç¹ûÓÃ»§ÊäÈë 'n'
 // 		{
-// 			init(storage);				 // éšæœºåˆå§‹åŒ–ç½‘ç»œå‚æ•°
-// 			write_para_to_file(storage); // å°†åˆå§‹åŒ–çš„ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶
-// 			printf("å‚æ•°åˆå§‹åŒ–å®Œæ¯•ï¼\n");
+// 			init(storage);				 // Ëæ»ú³õÊ¼»¯ÍøÂç²ÎÊı
+// 			write_para_to_file(storage); // ½«³õÊ¼»¯µÄÍøÂç²ÎÊıĞ´ÈëÎÄ¼ş
+// 			printf("²ÎÊı³õÊ¼»¯Íê±Ï£¡\n");
 // 		}
-// 	} while (g != 'y' && g != 'n'); // å¾ªç¯ç›´åˆ°ç”¨æˆ·è¾“å…¥ 'y' æˆ– 'n'
-// 	printf("=============================================\n"); // æ‰“å°åˆ†éš”çº¿
+// 	} while (g != 'y' && g != 'n'); // Ñ­»·Ö±µ½ÓÃ»§ÊäÈë 'y' »ò 'n'
+// 	printf("=============================================\n"); // ´òÓ¡·Ö¸ôÏß
 
-// 	// important å­¦ä¹ å¾ªç¯
+// 	// important Ñ§Ï°Ñ­»·
 // 	int epoch;
 // 	char v;
 // 	do
 // 	{
-// 		printf("è¯·è¾“å…¥é¢„è®­ç»ƒçš„æ¬¡æ•°ï¼š");
+// 		printf("ÇëÊäÈëÔ¤ÑµÁ·µÄ´ÎÊı£º");
 // 		scanf("%d", &epoch);
-// 		printf("å¼€å§‹è®­ç»ƒ\n");
+// 		printf("¿ªÊ¼ÑµÁ·\n");
 // 		train(epoch, storage, data);
-// 		printf("å¼€å§‹æµ‹è¯•\n");
+// 		printf("¿ªÊ¼²âÊÔ\n");
 // 		test_network(storage, data);
 // 		write_para_to_file(storage);
 // 		do
 // 		{
-// 			printf("ç»§ç»­è®­ç»ƒè¯·æŒ‰å›è½¦ï¼Œé€€å‡ºè¯·æŒ‰q: ");
-// 			setbuf(stdin, NULL);	  // æ¸…ç©ºè¾“å…¥ç¼“å†²åŒº
-// 			v = getchar();			  // è·å–ç”¨æˆ·è¾“å…¥
-// 			while (getchar() != '\n') // æ¸…ç©ºè¾“å…¥ç¼“å†²åŒºä¸­çš„å‰©ä½™å­—ç¬¦
+// 			printf("¼ÌĞøÑµÁ·Çë°´»Ø³µ£¬ÍË³öÇë°´q: ");
+// 			setbuf(stdin, NULL);	  // Çå¿ÕÊäÈë»º³åÇø
+// 			v = getchar();			  // »ñÈ¡ÓÃ»§ÊäÈë
+// 			while (getchar() != '\n') // Çå¿ÕÊäÈë»º³åÇøÖĞµÄÊ£Óà×Ö·û
 // 				;
-// 			if (v == 'q') // å¦‚æœç”¨æˆ·è¾“å…¥ 'q'
+// 			if (v == 'q') // Èç¹ûÓÃ»§ÊäÈë 'q'
 // 			{
-// 				write_para_to_file(storage); // å°†ç½‘ç»œå‚æ•°å†™å…¥æ–‡ä»¶
-// 				return 0;					 // é€€å‡ºç¨‹åº
+// 				write_para_to_file(storage); // ½«ÍøÂç²ÎÊıĞ´ÈëÎÄ¼ş
+// 				return 0;					 // ÍË³ö³ÌĞò
 // 			}
-// 			else if (v == '\n') // å¦‚æœç”¨æˆ·æŒ‰ä¸‹å›è½¦é”®
+// 			else if (v == '\n') // Èç¹ûÓÃ»§°´ÏÂ»Ø³µ¼ü
 // 			{
-// 				break; // é€€å‡ºå¾ªç¯ï¼Œç»§ç»­è®­ç»ƒ
+// 				break; // ÍË³öÑ­»·£¬¼ÌĞøÑµÁ·
 // 			}
-// 			else // å¦‚æœç”¨æˆ·è¾“å…¥å…¶ä»–å­—ç¬¦
+// 			else // Èç¹ûÓÃ»§ÊäÈëÆäËû×Ö·û
 // 			{
-// 				printf("è¾“å…¥é”™è¯¯ï¼Œè¯·é‡æ–°è¾“å…¥ï¼\n"); // æç¤ºè¾“å…¥é”™è¯¯
+// 				printf("ÊäÈë´íÎó£¬ÇëÖØĞÂÊäÈë£¡\n"); // ÌáÊ¾ÊäÈë´íÎó
 // 			}
-// 		} while (1); // å¾ªç¯ç›´åˆ°ç”¨æˆ·è¾“å…¥æ­£ç¡®
-// 	} while (v != 'q'); // å¾ªç¯ç›´åˆ°ç”¨æˆ·è¾“å…¥ 'q'
+// 		} while (1); // Ñ­»·Ö±µ½ÓÃ»§ÊäÈëÕıÈ·
+// 	} while (v != 'q'); // Ñ­»·Ö±µ½ÓÃ»§ÊäÈë 'q'
 
-// 	free(storage); // é‡Šæ”¾å­˜å‚¨ç½‘ç»œå‚æ•°çš„å†…å­˜
-// 	free(data);	   // é‡Šæ”¾å­˜å‚¨ç»“æœçš„å†…å­˜
+// 	free(storage); // ÊÍ·Å´æ´¢ÍøÂç²ÎÊıµÄÄÚ´æ
+// 	free(data);	   // ÊÍ·Å´æ´¢½á¹ûµÄÄÚ´æ
 
-// 	return 0; // è¿”å›0ï¼Œè¡¨ç¤ºç¨‹åºæ­£å¸¸ç»“æŸ
+// 	return 0; // ·µ»Ø0£¬±íÊ¾³ÌĞòÕı³£½áÊø
 // }
