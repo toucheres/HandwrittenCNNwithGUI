@@ -1,5 +1,5 @@
 #pragma once
-
+#include <dynamic_lib.h>
 #include <QMainWindow>
 #include <Point.h>
 #include "ui_mainWindow.h"

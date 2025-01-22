@@ -15,8 +15,8 @@ void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
 
     // 调色板: 0=黑,1=白
     RGBQUAD palette[2] = {
-        {0x00, 0x00, 0x00, 0x00},
-        {0xFF, 0xFF, 0xFF, 0x00}};
+        {0xFF, 0xFF, 0xFF, 0x00}, 
+        {0x00, 0x00, 0x00, 0x00}};
 
     std::vector<uint8_t> pixelData(dataSize, 0);
 

@@ -5,6 +5,7 @@
 #include<QDebug>
 #include <bmp.h>
 #include <Matrix.h>
+#include <dynamic_lib.h>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
 	mPixMap(QPixmap(30,30)),
@@ -45,6 +46,7 @@ void MainWindow::Identification()
 {
 	qDebug() << "点击了ide";
 	createBlackWhiteBMP(this->getout(), "C:/work/vscoderope/HandwrittenCNNwithGUI/test.bmp");
+	recongise("C:/work/vscoderope/HandwrittenCNNwithGUI/test.bmp");
 	//auto mat = mNet.Eval(mMat);
 	// long double maxNum = 0;
 	// int pos = 0, realPos = 0;
@@ -82,12 +84,12 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 	// }
 	QRgb tpARGB;
 	QImage tpimg = mPixMap.toImage();
-	for (size_t i = 0; i < 30; i++)
+	for (int i = 0; i < 30; i++)
 	{
-		for (size_t j = 0; j < 30; j++)
+		for (int j = 0; j < 30; j++)
 		{
 			tpARGB = tpimg.pixel(i, j);
-			if (tpARGB == Qt::white) // 即0xFFFFFFFF
+			if (tpARGB == Qt::white) // 即0xFFFFFFFF(白色)
 			{
 				mMat[i * 30 + j] = 0;
 			}
@@ -104,11 +106,12 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
 	//qDebug() << (event->pos() / 10) - QPoint(256, 200);
 	QPainter* painter = new QPainter;
-
+	
 	auto point = (event->pos() - QPoint(256, 200)) / 10;
 
 	painter->begin(&mPixMap);
-	painter->setPen(QPen(Qt::black, 1.5, Qt::CustomDashLine));
+	//painter->setRenderHint(QPainter::Antialiasing, true);//边缘渐变
+	painter->setPen(QPen(Qt::black, 1.3, Qt::CustomDashLine));
 	painter->drawLine(mStartPoint, point); //绘制开始点到移动点的位置
 	painter->end();
 	mStartPoint = point;
@@ -120,18 +123,18 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 
 	QRgb tpARGB;
 	QImage tpimg = mPixMap.toImage();
-	for (size_t i = 0; i < 30; i++)
+	for (int i = 0; i < 30; i++)
 	{
-		for (size_t j = 0; j < 30; j++)
+		for (int j = 0; j < 30; j++)
 		{
 			tpARGB = tpimg.pixel(j, i);
-			if (tpARGB == 0xFFFFFFFF)
+			if (tpARGB == 0xFFFFFFFF)//为白色
 			{
-				mMat[i * 30 + j] = 1;
+				mMat[i * 30 + j] = 0;
 			}
 			else
 			{
-				mMat[i * 30 + j] = 0;
+				mMat[i * 30 + j] = 1;
 			}
 		}
 		

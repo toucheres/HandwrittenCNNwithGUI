@@ -15,7 +15,7 @@ Date: 1999年13月32日
 // #include <unistd.h> // POSIX 标准库，包含对操作系统 API 的访问
 
 // 定义宏函数 max，用于返回两个数中的较大值
-#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define  max___(a, b) (((a) > (b)) ? (a) : (b))
 
 // 定义样本数量
 #define SAMPLE_NUM 30
@@ -29,11 +29,6 @@ Date: 1999年13月32日
 DLL_API int add_dll(int x, int y);
 DLL_API BOOL DataLoader();
 
-// 学习率
-double lr;
-
-// 结果数组
-double result[11];
 
 // 定义网络参数结构体(参数)
 struct parameter
@@ -74,9 +69,10 @@ struct sample
     double a[30][30]; // 样本数据
     // TODO 为什么是double类型？
     int number;            // 样本标签
-} Sample[SAMPLE_NUM * 10]; // 样本数组 存储0-9各30张图
+}; // 样本数组 存储0-9各30张图
 DLL_API void init(struct parameter *para);
 DLL_API BOOL read_file(struct parameter *parameter_dest);
 DLL_API BOOL write_para_to_file(struct parameter *parameter_file);
 DLL_API void train(int epochs, struct parameter *para, struct result *data);
 DLL_API void test_network(struct parameter *parameter2, struct result *data2);
+DLL_API int recongise(const char *path_bmp);
