@@ -1,0 +1,1 @@
+将network_parameter.txt放入与exe同级目录
