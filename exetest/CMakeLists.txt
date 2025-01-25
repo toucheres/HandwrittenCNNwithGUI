@@ -48,7 +48,7 @@ add_executable(exetest ${SOURCES})
 target_include_directories(exetest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # 查找 dlltest 包
-find_package(dlltest REQUIRED PATHS C:/work/vscoderope/HandwrittenCNNwithGUI/build/dlltest NO_DEFAULT_PATH)
+find_package(dlltest REQUIRED PATHS C:/work/vscoderope/HandwrittenCNNwithGUI/out/build/x64-debug/dlltest NO_DEFAULT_PATH)
 
 # 链接库
 target_link_libraries(exetest PRIVATE dlltest::dlltest Qt6::Widgets) 

@@ -5,6 +5,7 @@
 #include<qpushbutton.h>
 #include<vector>
 #include <QLabel>
+#include <qspinbox.h>
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -16,6 +17,7 @@ public:
 public Q_SLOTS:
     void Clear();
     void Identification();
+    void Train();
     std::vector<int> &getout();
 
 protected: 
@@ -30,4 +32,8 @@ private:
     QPoint mStartPoint,mEndPoint;
     std::vector<int>mMat;
     QLabel mLabel;
+    void savebmp_mem();
+    void savebmp_file(std::string path);
+    int num_each=0;
+    int num_now=0;
 };

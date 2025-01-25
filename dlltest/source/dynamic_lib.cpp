@@ -6,7 +6,7 @@ double lr;
 // 结果数组
 double result[11];
 
-sample Sample[SAMPLE_NUM * 10];
+sample Sample[SAMPLE_NUM * 20];
 #define DLL_API _declspec(dllexport)
 	DLL_API int
 	add_dll(int a, int b) // 实现两个整数相加
@@ -606,8 +606,12 @@ void show_progress_bar(int progress, int total)
 }
 
 // important 训练，学习
-DLL_API void train(int epochs, struct parameter *para, struct result *data)
+DLL_API void train(int epochs, int num_all)
 {
+	struct parameter* para = (struct parameter*)malloc(sizeof(struct parameter)); // 分配内存用于存储网络参数
+	struct result* data = (struct result*)malloc(sizeof(struct result)); // 分配内存用于存储结果
+	read_file(para);
+
 	system("chcp 65001");
 	double corss_loss = 2;						 // 初始化交叉熵损失
 	for (int epoch = 0; epoch < epochs; epoch++) // 遍历每个训练周期
@@ -632,7 +636,7 @@ DLL_API void train(int epochs, struct parameter *para, struct result *data)
 		srand(time(NULL)); // 初始化随机数种子
 		struct sample *sample_tmp = NULL;
 		sample_tmp = (struct sample *)malloc(sizeof(struct sample)); // 分配内存用于临时存储样本
-		for (int q = 0; q < SAMPLE_NUM * 10; q++)					 // 随机交换样本
+		for (int q = 0; q < num_all; q++)					 // 随机交换样本
 		{
 			a = (int)((rand() / (RAND_MAX + 1.0)) * 300);
 			b = (int)((rand() / (RAND_MAX + 1.0)) * 300);
@@ -646,7 +650,7 @@ DLL_API void train(int epochs, struct parameter *para, struct result *data)
 				continue;
 		}
 
-		for (int i = 0; i < SAMPLE_NUM * 10; i++) // 遍历每个样本
+		for (int i = 0; i < num_all; i++) // 遍历每个样本
 		{
 			corss_loss = 0; // 初始化交叉熵损失
 			(*sample_tmp) = Sample[i];
@@ -661,8 +665,67 @@ DLL_API void train(int epochs, struct parameter *para, struct result *data)
 		sample_tmp = NULL;
 	}
 	printf("\n");
+	test_network(para, data);
 	return;
 }
+//// important 训练，学习
+//DLL_API void train(int epochs, struct parameter* para, struct result* data, int num_all)
+//{
+//	system("chcp 65001");
+//	double corss_loss = 2;						 // 初始化交叉熵损失
+//	for (int epoch = 0; epoch < epochs; epoch++) // 遍历每个训练周期
+//	{
+//		lr = pow((corss_loss / 10), 1.7); // 根据交叉熵损失计算学习率
+//		if (lr > 0.01)					  // 限制学习率的最大值
+//		{
+//			lr = 0.01;
+//		}
+//
+//		show_progress_bar(epoch + 1, epochs); // 显示训练进度条
+//		if ((epoch + 1) % 10 == 0)			  // 每10个周期输出一次交叉熵损失和学习率
+//		{
+//			fflush(stdout); // 刷新输出缓冲区
+//			printf("\t交叉熵损失: %lf  学习率:%.10lf\n", corss_loss, lr);
+//			if (lr < 0.0000000001) // 如果学习率过小，则保存网络参数
+//				printf_file2(para);
+//		}
+//
+//		// 随机交换样本，打乱顺序
+//		int a, b;
+//		srand(time(NULL)); // 初始化随机数种子
+//		struct sample* sample_tmp = NULL;
+//		sample_tmp = (struct sample*)malloc(sizeof(struct sample)); // 分配内存用于临时存储样本
+//		for (int q = 0; q < num_all; q++)					 // 随机交换样本
+//		{
+//			a = (int)((rand() / (RAND_MAX + 1.0)) * 300);
+//			b = (int)((rand() / (RAND_MAX + 1.0)) * 300);
+//			if (a >= 0 && a < 300 && (a != b) && b >= 0 && b < 300)
+//			{
+//				(*sample_tmp) = Sample[a];
+//				Sample[a] = Sample[b];
+//				Sample[b] = (*sample_tmp);
+//			}
+//			else
+//				continue;
+//		}
+//
+//		for (int i = 0; i < num_all; i++) // 遍历每个样本
+//		{
+//			corss_loss = 0; // 初始化交叉熵损失
+//			(*sample_tmp) = Sample[i];
+//			int y = sample_tmp->number;					   // 获取样本标签
+//			forward(&sample_tmp->a[0][0], para, data);	   // 前向传播
+//			backward(y, para, data);					   // 反向传播
+//			double g = Cross_entropy(&data->result[0], y); // 计算交叉熵损失
+//			if (g > corss_loss)
+//				corss_loss = g; // 更新交叉熵损失
+//		}
+//		free(sample_tmp); // 释放临时存储的样本内存
+//		sample_tmp = NULL;
+//	}
+//	printf("\n");
+//	return;
+//}
 
 DLL_API void test_network(struct parameter *parameter2, struct result *data2)
 {
@@ -762,19 +825,19 @@ DLL_API int recongise(const char *path_bmp)
 {
 	// 控制台输出utf8
 	system("chcp 65001");
-	int h = DataLoader(); // 加载训练数据
-	if (h == TRUE)
-	{
-		printf("训练数据读取成功！\n");
-	}
-	else if (h == FALSE)
-	{
-		printf("训练集读取失败！程序自动退出\n");
-		return 0;
-	}
+	//int h = DataLoader(); // 加载训练数据
+	//if (h == TRUE)
+	//{
+	//	printf("训练数据读取成功！\n");
+	//}
+	//else if (h == FALSE)
+	//{
+	//	printf("训练集读取失败！程序自动退出\n");
+	//	return 0;
+	//}
 
-	printf("=============================================\n");
-	printf("开始训练网络\n");
+	//printf("=============================================\n");
+	//printf("开始训练网络\n");
 	// 参数,分配到堆上的参数
 	struct parameter *storage;
 	(storage) = (struct parameter *)malloc(sizeof(struct parameter)); // 分配内存用于存储网络参数
@@ -883,6 +946,94 @@ DLL_API int recongise(const char *path_bmp)
 	free(data);	   // 释放存储结果的内存
 
 	return 0; // 返回0，表示程序正常结束
+}
+
+DLL_API int train_data_loader(int* numeach)
+{
+
+	int index = 0;
+	for (int num = 0; num < 10; num++)
+	{ // 遍历数字0到9
+		for (int i = 0; i < numeach[num]; i++)
+		{												  // 遍历每个数字的样本
+			char* e = (char*)malloc(sizeof(char) * 120); // 分配120字节的内存用于存储图像数据
+			int* l = (int*)malloc(sizeof(int) * 960);	  // 分配960个整数的内存用于存储二值化后的图像数据
+			if (e == NULL || l == NULL)
+			{ // 检查内存分配是否成功
+				perror("内存分配失败！\n");
+				free(e);	  // 释放已分配的内存
+				free(l);	  // 释放已分配的内存
+				return FALSE; // 返回FALSE表示内存分配失败
+			}
+
+			char route_name[50] = "Training_set/"; // 定义训练集文件路径
+			char file_name[15];
+			sprintf(file_name, "%d/%d.bmp", num, i + 1); // 生成文件名
+			strcat(route_name, file_name);				 // 拼接文件路径
+
+			FILE* fp = fopen(route_name, "rb"); // 打开文件
+			if (!fp)
+			{ // 检查文件是否成功打开
+				perror("未能打开训练集数据. 检查'Training_set'文件夹是否存在，并且文件夹中有图片!\n");
+				free(e); // 释放已分配的内存
+				free(l);
+				return FALSE; // 返回FALSE表示文件打开失败
+			}
+
+			fseek(fp, 62, SEEK_SET);		 // 跳过文件头部的62字节
+			fread(e, sizeof(char), 120, fp); // 读取120字节的图像数据
+			fclose(fp);						 // 关闭文件
+			// TODO 转为二进制
+			// XXX 输入为30x30无灰度bmp图
+			int y = 0;
+			for (int r = 0; r < 120; r++)
+			{ // 遍历读取的图像数据
+				for (int u = 1; u < 9; u++)
+				{											// 遍历每个字节的每一位
+					l[y] = (int)((e[r] >> (8 - u)) & 0x01); // 将每一位转换为二值化数据
+					y++;
+					if (y > 960)
+						break;
+				}
+			}
+			// TODO 存储二进制到Sample
+			int g = 0;
+			for (int u = 0; u < 30; u++)
+			{ // 遍历0-29(1-30)行
+				y = 0;
+				for (int j = 0; j < 32; j++)
+				{ // 遍历0-29(1-30)列
+					if (j != 30 && j != 31)
+					{												 // 跳过第30和第31列
+						Sample[index].a[u][y] = l[g]; // 将二值化数据存储到样本数组中
+						y++;
+					}
+					g++;
+				}
+			}
+
+			int q = Sample[index].a[0][0];
+			if (q == 1)
+			{
+
+				// TODO why如果第一个像素为1，则将图像数据取反
+				// 如果第一个像素为1，则将图像数据取反
+				for (int b = 0; b < 30; b++)
+				{
+					for (int n = 0; n < 30; n++)
+					{
+						Sample[index].a[b][n] = 1 - Sample[index].a[b][n];
+					}
+				}
+			}
+
+			Sample[index].number = num; // 设置样本的标签
+			index++;
+			free(e);								   // 释放已分配的内存
+			free(l);
+		}
+	}
+	return index; 
 }
 
 // int main(int argc, char const *argv[])

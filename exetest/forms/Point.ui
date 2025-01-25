@@ -40,6 +40,68 @@
      <string>识别</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="tarin">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>设置训练图集</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="inputready">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>30</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>输入好了</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="paintready">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>150</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>画好了</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="select">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="train_start">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>70</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>从训练图集开始训练</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -47,7 +109,7 @@
      <x>0</x>
      <y>0</y>
      <width>832</width>
-     <height>33</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>

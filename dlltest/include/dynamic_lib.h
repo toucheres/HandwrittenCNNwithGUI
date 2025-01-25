@@ -26,8 +26,8 @@ Date: 1999年13月32日
 #define FALSE 0
 
 #define  DLL_API _declspec(dllexport)
-DLL_API int add_dll(int x, int y);
-DLL_API BOOL DataLoader();
+//DLL_API int add_dll(int x, int y);
+//DLL_API BOOL DataLoader();
 
 
 // 定义网络参数结构体(参数)
@@ -70,9 +70,27 @@ struct sample
     // TODO 为什么是double类型？
     int number;            // 样本标签
 }; // 样本数组 存储0-9各30张图
-DLL_API void init(struct parameter *para);
-DLL_API BOOL read_file(struct parameter *parameter_dest);
-DLL_API BOOL write_para_to_file(struct parameter *parameter_file);
-DLL_API void train(int epochs, struct parameter *para, struct result *data);
-DLL_API void test_network(struct parameter *parameter2, struct result *data2);
-DLL_API int recongise(const char *path_bmp);
+//DLL_API void init(struct parameter *para);
+//DLL_API BOOL read_file(struct parameter *parameter_dest);
+//DLL_API BOOL write_para_to_file(struct parameter *parameter_file);
+//DLL_API void train(int epochs, int numall);
+//DLL_API void test_network(struct parameter *parameter2, struct result *data2);
+//DLL_API int recongise(const char *path_bmp);
+//DLL_API int train_data_loader(int* numeach);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    DLL_API int add_dll(int x, int y);
+    DLL_API BOOL DataLoader();
+    DLL_API void init(struct parameter* para);
+    DLL_API BOOL read_file(struct parameter* parameter_dest);
+    DLL_API BOOL write_para_to_file(struct parameter* parameter_file);
+    DLL_API void train(int epochs, int numall);
+    DLL_API void test_network(struct parameter* parameter2, struct result* data2);
+    DLL_API int recongise(const char* path_bmp);
+    DLL_API int train_data_loader(int* numeach);
+
+#ifdef __cplusplus
+}
+#endif

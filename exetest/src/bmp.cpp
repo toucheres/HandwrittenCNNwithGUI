@@ -1,4 +1,6 @@
 ﻿#include <bmp.h>
+#include <iostream>
+#include <filesystem>
 void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
 {
     const int width = 30, height = 30;
@@ -34,9 +36,29 @@ void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
     // 额外2字节拼至184字节总长
     uint8_t extraPad[2] = {0, 0};
 
+    //找到目录路径
+    std::string path_dir = path;
+    size_t index_1 = path.rfind("/");
+    size_t index_2 = path.rfind("\\");
+    if (index_1 == std::string::npos) { index_1 = 0; }
+    if (index_2 == std::string::npos) { index_2 = 0; }
+    path_dir.resize(index_1>index_2?index_1:index_2);
+
+    
+    if (!std::filesystem::exists(path_dir))
+    {
+        //路径不存在
+        std::filesystem::create_directories(path_dir);
+    }
+
     std::ofstream out(path, std::ios::binary);
     if (!out)
+    {
+        std::wcout << "打开";
+        std::cout<< path;
+        std::wcout << "失败" << std::endl;
         return;
+    }
     out.write(reinterpret_cast<const char *>(&fileHeader), sizeof(fileHeader));
     out.write(reinterpret_cast<const char *>(&infoHeader), sizeof(infoHeader));
     out.write(reinterpret_cast<const char *>(palette), sizeof(palette));
