@@ -1,1 +1,3 @@
 将network_parameter.txt放入与exe同级目录
+若需使用训练集与测试集，将其分别改名为Training_set和Test_set
+可自定义训练集，至少为30/num
