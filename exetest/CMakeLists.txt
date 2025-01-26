@@ -11,6 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_PREFIX_PATH $ENV{QTDIR})
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Widgets REQUIRED)
+find_package(Qt6Concurrent REQUIRED)
 
 
 set(FORMS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/forms")
@@ -51,7 +52,7 @@ target_include_directories(exetest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 find_package(dlltest REQUIRED PATHS C:/work/vscoderope/HandwrittenCNNwithGUI/out/build/x64-debug/dlltest NO_DEFAULT_PATH)
 
 # 链接库
-target_link_libraries(exetest PRIVATE dlltest::dlltest Qt6::Widgets) 
+target_link_libraries(exetest PRIVATE dlltest::dlltest Qt6::Widgets Qt6::Concurrent) 
 # Add the target includes for MY_PROJECT 
 target_include_directories(exetest PRIVATE ${FORMS_DIR})
 target_include_directories(exetest PRIVATE ${INCLUDE_DIR})

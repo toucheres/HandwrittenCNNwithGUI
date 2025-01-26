@@ -9,6 +9,7 @@
 #include <iostream>
 #include <dynamic_lib.h>
 #include <filesystem>
+#include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent),
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 		if (num_now < num_each * 10)
 		{
 			char path[100];
-			sprintf(path, "C:/work/vscoderope/HandwrittenCNNwithGUI/Training_set/%d/%d.bmp", num_now / num_each, num_now % num_each);
+			sprintf(path, "Training_set/%d/%d.bmp", num_now / num_each, num_now % num_each + 1);
 			savebmp_file(path);
 			num_now++;
 			if (num_now == num_each * 10)
@@ -86,8 +87,8 @@ void MainWindow::Clear()
 void MainWindow::Identification()
 {
 	std::wcout << "点击了ide" << std::endl;
-	savebmp_file("C:/work/vscoderope/HandwrittenCNNwithGUI/test.bmp");
-	recongise("C:/work/vscoderope/HandwrittenCNNwithGUI/test.bmp");
+	savebmp_file("test.bmp");
+	recongise("test.bmp");
 	// auto mat = mNet.Eval(mMat);
 	//  long double maxNum = 0;
 	//  int pos = 0, realPos = 0;
@@ -112,7 +113,7 @@ void MainWindow::Train()
 		for (size_t j = 0; ; j++)
 		{
 			char path[100];
-			sprintf(path, "C:/work/vscoderope/HandwrittenCNNwithGUI/out/build/x64-debug/exetest/Training_set/%d/%d.bmp", i, j+1);
+			sprintf(path, "Training_set/%d/%d.bmp", i, j+1);
 			if (!std::filesystem::exists(path))
 			{
 				std::wcout << "打开";
@@ -128,7 +129,7 @@ void MainWindow::Train()
 		}
 	}
 	train_data_loader(numeach);
-	train(20, numall);
+	train(100, numall);
 }
 
 std::vector<int> &MainWindow::getout()

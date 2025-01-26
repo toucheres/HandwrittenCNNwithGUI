@@ -580,7 +580,7 @@ double Cross_entropy(double *a, int m)
 // 显示进度条函数
 void show_progress_bar(int progress, int total)
 {
-	system("chcp 65001");
+	//system("chcp 65001");
 	int bar_width = 50;								  // 进度条宽度
 	float percent_complete = (float)progress / total; // 计算完成百分比
 	int position = bar_width * percent_complete;	  // 计算进度条位置
@@ -610,9 +610,14 @@ DLL_API void train(int epochs, int num_all)
 {
 	struct parameter* para = (struct parameter*)malloc(sizeof(struct parameter)); // 分配内存用于存储网络参数
 	struct result* data = (struct result*)malloc(sizeof(struct result)); // 分配内存用于存储结果
-	read_file(para);
+	
+	if (read_file(para)==FALSE)
+	{
+		//无参就随机初始化
+		init(para);
+	}
 
-	system("chcp 65001");
+	//system("chcp 65001");
 	double corss_loss = 2;						 // 初始化交叉熵损失
 	for (int epoch = 0; epoch < epochs; epoch++) // 遍历每个训练周期
 	{
@@ -628,7 +633,7 @@ DLL_API void train(int epochs, int num_all)
 			fflush(stdout); // 刷新输出缓冲区
 			printf("\t交叉熵损失: %lf  学习率:%.10lf\n", corss_loss, lr);
 			if (lr < 0.0000000001) // 如果学习率过小，则保存网络参数
-				printf_file2(para);
+				write_para_to_file(para);
 		}
 
 		// 随机交换样本，打乱顺序
@@ -638,8 +643,8 @@ DLL_API void train(int epochs, int num_all)
 		sample_tmp = (struct sample *)malloc(sizeof(struct sample)); // 分配内存用于临时存储样本
 		for (int q = 0; q < num_all; q++)					 // 随机交换样本
 		{
-			a = (int)((rand() / (RAND_MAX + 1.0)) * 300);
-			b = (int)((rand() / (RAND_MAX + 1.0)) * 300);
+			a = (int)((rand() / (RAND_MAX + 1.0)) * num_all);
+			b = (int)((rand() / (RAND_MAX + 1.0)) * num_all);
 			if (a >= 0 && a < 300 && (a != b) && b >= 0 && b < 300)
 			{
 				(*sample_tmp) = Sample[a];
