@@ -3,4 +3,5 @@
 /.vscode
 /out
 /train
+CMakeSettings.json
 test.bmp
