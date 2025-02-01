@@ -9,7 +9,8 @@
 #include <iostream>
 #include <dynamic_lib.h>
 #include <filesystem>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrentRun>
+#include <QFuture>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent),
@@ -35,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui.inputready, &QPushButton::clicked, [=]() {
 		if (ui.select->value() >= 30)
 		{
+			ui.select->hide();
+			ui.tarin->hide();
 			num_each = ui.select->value();
 			ui.paintready->show();
 		}
@@ -61,8 +64,21 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 		});
 	connect(ui.train_start, &QPushButton::clicked, [=]() {
-		//std::string cpath = std::filesystem::current_path().string();
-		Train();
+		//新开线程防阻塞
+					//ui.train
+		ui.recongnise->hide();
+		QFuture<void> future = QtConcurrent::run([=]()
+			{
+				this->Train();
+			});
+		while (!future.isFinished())
+		{
+			QApplication::processEvents(QEventLoop::AllEvents, 30);
+		}
+		ui.recongnise->show();
+		ui.tarin->show();
+		ui.select->show();
+		ui.inputready->show();
 		});
 
 	mLabel.setText("识别的数字是:");
@@ -129,7 +145,7 @@ void MainWindow::Train()
 		}
 	}
 	train_data_loader(numeach);
-	train(100, numall);
+	train(10, numall);
 }
 
 std::vector<int> &MainWindow::getout()

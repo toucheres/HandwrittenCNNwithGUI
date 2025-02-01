@@ -1,7 +1,7 @@
 ﻿#include <bmp.h>
 #include <iostream>
 #include <filesystem>
-void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
+void createBlackWhiteBMP(const std::vector<int> &bw, std::string path)
 {
     const int width = 30, height = 30;
     if (bw.size() != width * height)
@@ -37,19 +37,41 @@ void createBlackWhiteBMP(const std::vector<int> &bw, const std::string &path)
     uint8_t extraPad[2] = {0, 0};
 
     //找到目录路径
-    std::string path_dir = path;
     size_t index_1 = path.rfind("/");
     size_t index_2 = path.rfind("\\");
     if (index_1 == std::string::npos) { index_1 = 0; }
     if (index_2 == std::string::npos) { index_2 = 0; }
-    path_dir.resize(index_1>index_2?index_1:index_2);
+    if ((!index_1) && (!index_2))
+    {
+        // 相对路径
+        // path_dir = path_dir = std::filesystem::current_path().string();
+        // 目录必存在
+        path = std::filesystem::current_path().string() + "\\" + path;
+    }
+    else
+    {
+        //绝对路径
+        std::string path_dir = path;
+        //找到目录
+        path_dir.resize(index_1 > index_2 ? index_1 : index_2);
+        if (!std::filesystem::exists(path_dir))
+        {
+            
+
+            if (std::filesystem::exists(path_dir))
+            {
+                // 目录路径存在  
+            }
+            else
+            {
+                // 目录路径不存在
+                std::filesystem::create_directories(path_dir);
+            }
+        }
+
+    }
 
     
-    if (!std::filesystem::exists(path_dir))
-    {
-        //路径不存在
-        std::filesystem::create_directories(path_dir);
-    }
 
     std::ofstream out(path, std::ios::binary);
     if (!out)
